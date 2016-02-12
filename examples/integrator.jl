@@ -75,4 +75,3 @@ if !ViewerActive
     @spawn escher_serve(5555,Pkg.dir("SurfaceGeometry","examples","viewers"))
     ViewerActive = true
 end
-
