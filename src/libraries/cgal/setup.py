@@ -1,7 +1,3 @@
-# python setup.py build build_ext --inplace
-# python setup.py build
-# python steup.py install
-
 from distutils.core import setup, Extension
 import numpy.distutils.misc_util
 
