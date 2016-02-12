@@ -12,8 +12,4 @@ export vnormal, ZinchenkoDifertential!, vcurvature, ellipsoid_parameters, volume
 include("Integrator.jl")
 export TimeStepers, EilerStep, AdamsStep, step!, properstep
 
-include("ViewMesh.jl")
-export view3d
-# package code goes here
-
 end # module
