@@ -1,0 +1,7 @@
+julia 0.4
+ForwardDiff
+PyCall
+MATLAB
+Escher
+Compat  # I don't now it is needed
+ThreeJS

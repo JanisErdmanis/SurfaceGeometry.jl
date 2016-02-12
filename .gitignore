@@ -1,0 +1,13 @@
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+*~
+*.pyc
+*.so
+*.o
+*.ipynb
+build/
+__pychache__/
+**/.juliahistory
+.ipynb_checkpoints/
+
