@@ -2,7 +2,7 @@
 
 before_install:
    - sudo apt-get -qq update
-   - sudo apt-get install -y libcgal-dev python-numpy
+   - sudo apt-get install -y libcgal-dev python3-numpy
   
 language: julia
 os:

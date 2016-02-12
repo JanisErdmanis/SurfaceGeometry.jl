@@ -88,6 +88,8 @@ end
 # Some kind of mesh simplificaction is needed for using it in computations
 function ellipsoid_mesh_cgal(a,b,c,angular_bound=20,radius_bound=0.5,distance_bound=0.1,bounding_radius=8.0)
 
+    ENV["PYTHON"] = "/usr/bin/python3" 
+    eval(:(Pkg.build("PyCall")))
     eval(:(using PyCall))
     unshift!(PyVector(pyimport("sys")["path"]), "")
 
