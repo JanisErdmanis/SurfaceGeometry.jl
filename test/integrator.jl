@@ -1,22 +1,20 @@
 isdefined(:N) || (N=100)
-isdefined(:meth) || (meth=AdamsStep)
 isdefined(:PasiveStabilisation) || (PasiveStabilisation=false)
-isdefined(:ActiveStabilisation) || (ActiveStabilisation=false)
 
 using JLD
 data = load("sphere.jld")
 points = data["points"]
 faces = data["faces"]
 
-function velocity(points::Array{Float64,2},faces::Array{Int,2},t::Float64) ### Iterator also can be fit as an argument
+function velocity(t,points,faces) 
     v = Array(Float64,size(points)...)
     for xkey in 1:size(points,2)
-        v[:,xkey] = velocity(points[:,xkey],t)
+        v[:,xkey] = velocity(t,points[:,xkey])
     end
     return v
 end
 
-function velocity(pos,t)
+function velocity(t,pos)
     x,y,z = pos
     
     x = x*0.15 + 0.35
@@ -30,30 +28,25 @@ function velocity(pos,t)
     [u,v,w]  # /0.15
 end
 
-steppers = convert(Array{meth,1},[])
-for i in 1:size(points,2)
-    s = meth(0,points[:,i])
-    push!(steppers,s)
-end
-
-ti = 0.
-points = step!(steppers,velocity(points,faces,ti),0.000001)
-ti += 0.000001
-
 h = 3/N
 
-for i in 1:N
-    v = velocity(points,faces,ti)
+t1 = 0
+p1 = points
+
+v1 = velocity(t1,p1,faces)
+v1 = velocity(t1 + h/2,p1 + h/2*v1,faces)
+t2,p2 = t1 + h, p1 + h*v1
+
+for i in 2:N
+    v2 = velocity(t2,p2,faces)
 
     if PasiveStabilisation==true
-        for xkey in 1:size(points,2)
-            iter = FaceRing(xkey,faces)
-            n = vnormal(xkey,points,faces,iter)
-            v[:,xkey] = n*dot(n,v[:,xkey])
-        end
+        res = stabilise(p2,faces,v2;vp=v1)
+        println("Finit $(res.Finit) \t Fres $(res.Fres)")
+        v2 = res.vres
     end
-    
-    points = step!(steppers,v,h)
-    ti += h
-end
 
+    ### Adams Bachforth oneliner
+    (t1,p1,v1), (t2,p2) = (t2,p2,v2), (t2+h,p2 + h/2/(t2-t1)*( (2*(t2-t1) + h)*v2 - h*v1))
+
+end

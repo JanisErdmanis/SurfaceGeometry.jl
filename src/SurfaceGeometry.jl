@@ -1,15 +1,22 @@
 module SurfaceGeometry
 
-include("MeshGeneration.jl")
-export pushback, ellipsoid_mesh_matlab, ellipsoid_mesh_cgal
+include("MeshGenerationMethods/Utils.jl")
+include("MeshGenerationMethods/CGAL.jl")
+include("MeshGenerationMethods/Distmesh.jl")
+export EllipsoidMesh, SurfaceMesh, volume, DistmeshSurfaceMesher, CGALSurfaceMesher
 
 include("Iterators.jl")
-export FaceRing, find_triangle_vertex, find_other_triangle_edge
+include("ComplexDS.jl")
+export FaceBasedDS, ConnectivityDS
+export FaceVRing, VertexVRing, DoubleVertexVRing
 
 include("Properties.jl")
-export vnormal, ZinchenkoDifertential!, vcurvature, ellipsoid_parameters, volume
+export NormalVectors!, MeanCurvatures!, FitEllipsoid,
 
-include("Integrator.jl")
-export TimeStepers, EilerStep, AdamsStep, step!, properstep
+i### Essential from stabilistation
+include("StabilisationMethods/stabilisationV1.jl")
+include("StabilisationMethods/stabilisationV2.jl")
+include("StabilisationMethods/Stabilisation.jl")
+export stabilise
 
 end # module

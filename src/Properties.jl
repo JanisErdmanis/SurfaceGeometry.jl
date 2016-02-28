@@ -27,6 +27,11 @@ function vnormal(v::Int,points::Array{Float64,2},faces::Array{Int,2},Iterator)
     return N_MWA
 end
 
+function NormalVectors!(n,points,faces,FaceVRing)
+    for i in 1:size(points,2)
+        n[:,i] = vnormal(i,points,faces,FaceVRing(i))
+    end
+end
 
 function ZinchenkoDifertential!(vects,vnormal,R)
 
@@ -75,7 +80,7 @@ function ZinchenkoDifertential!(vects,vnormal,R)
 end
 
 ### Orginals ieks utils.jl
-function vcurvature(v::Int,points::Array{Float64,2},faces::Array{Int,2},Iterator,normal)
+function vcurvature(v::Int,points::Array{Float64,2},faces::Array{Int,2},normal,Iterator)
 
     #points = msh.points
     vring = Array(Int,0)
@@ -103,8 +108,13 @@ function vcurvature(v::Int,points::Array{Float64,2},faces::Array{Int,2},Iterator
     return H*2
 end
 
+function MeanCurvatures!(curvatures,points,faces,n,VertexVRing)
+    for i in 1:size(points,2)
+        curvatures[i] = vcurvature(i,points,faces,n[:,i],VertexVRing(i))
+    end
+end
 
-function ellipsoid_parameters(points)
+function FitEllipsoid(points)
 
     x = points[1,:][:]
     y = points[2,:][:]
@@ -138,34 +148,9 @@ function ellipsoid_parameters(points)
 end
 
 
-"Calculation of precise volume. Needed for convergence check"
-function volume(points,faces)
+function ellipsoid_parameters(points)
 
-    normal0 = [0,0,1]
-
-    s = 0
-
-    for tri in 1:size(faces,2)
-        face = faces[:,tri]
-        y1 = points[:,face[1]]
-        y2 = points[:,face[2]]
-        y3 = points[:,face[3]]
-
-        normaly = cross(y2-y1,y3-y1)
-        normaly /= norm(normaly)
-
-        area = norm(cross(y2-y1,y3-y1))/2
-        areaproj = dot(normaly,normal0)*area
-        volume = dot(y1 + y2 + y3,normal0)/3*areaproj
-
-        s += volume
-    end
-
-    return s
-
-    # Calculate face normal
-    # Calculate projected area
-    # Calculate ordinary volume 
-    # Calculate volume between projected and real area
-    # (+) if normal is outwards
+    warn("Deprecated syntax use FitEllipsoid instead")
+    FitEllipsoid(points)
 end
+

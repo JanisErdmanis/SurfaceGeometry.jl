@@ -16,6 +16,16 @@ function ConvertToTuple(p,t)
     return points,faces
 end
 
+function elipspar(p)
+    elpar = (0,0,0)
+    try
+        elpar = ellipsoid_parameters(p)
+    catch
+        elpar = (0.,0.,0.)
+    end
+
+    return [round(i,2) for i in elpar]
+end
 
 function main(window)
     
@@ -24,7 +34,7 @@ function main(window)
 
     convert(Int,round(3.6))
 
-    geom(frame) = geometry(ConvertToTuple(frames[frame][1],frames[frame][2])...)
+    geom(frame) = geometry(ConvertToTuple(memory[frame][2],memory[frame][3])...)
     
     ff = Signal(1)
     #ThreeJS.title(2,"Viewer for time dependant calculation"),
@@ -33,17 +43,17 @@ function main(window)
          hbox(
             vbox(
                  #"data",
-                 hbox("frame",slider(1:size(frames,1)) >>> ff),
+                 hbox("frame",slider(1:size(memory,1)) >>> ff),
                  ),
              ),
          vskip(2em),
 
          map(ff) do ff
          vbox(
-             """
-             Time is $(round(t[ff],2));          
-             Volume is $(round(volume(frames[ff]...),4));
-             Elipsoid parameters $([round(i,2) for i in ellipsoid_parameters(frames[ff][1])])
+              """
+              Time is $(try round(memory[ff][1],2) catch NaN end);          
+              Volume is $(try round(volume(memory[ff][2],memory[ff][3]),4) catch NaN end);
+              Elipsoid parameters $(try [round(i,2) for i in FitEllipsoid(memory[ff][2])] catch NaN end)
              """,
           outerdiv() <<
           (

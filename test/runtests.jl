@@ -34,7 +34,8 @@ println("Mesh generation with CGAL")
 ### Interface will change to pass signed distance function
 ### CGAL mesh generator
 try
-    points, faces = ellipsoid_mesh_cgal(1,1,1)
+    mesher = CGALSurfaceMesher()
+    points, faces = EllipsoidMesh(1,1,1,mesher)
     @test SphereError(points) < 0.01
 catch
     warn("does not work")
@@ -43,15 +44,16 @@ end
 ### Matlab mesh generator
 println("Mesh generation with distmesh")
 try
-    points, faces = ellipsoid_mesh_matlab(1,1,1,0.35)
+    mesher = DistmeshSurfaceMesher(0.35)
+    points, faces = EllipsoidMesh(1,1,1,mesher)
     @test SphereError(points) < 0.01
 catch
     warn("does not work")
 end
 
 ### Testing a pushback
-sdist(x) = x[1]^2 + x[2]^2 + x[3]^2 - 1
-@test isapprox(norm(pushback(sdist,[1.,1.,1.])),1)
+# sdist(x) = x[1]^2 + x[2]^2 + x[3]^2 - 1
+# @test isapprox(norm(pushback(sdist,[1.,1.,1.])),1)
 
 ### Testing topology
 
@@ -61,12 +63,76 @@ t = [5,7,10,7,5,6,4,0,3,0,4,6,4,7,6,4,9,10,7,4,10,0,2,1,2,0,6,2,5,1,5,2,6,8,4,3,
 faces = reshape(t,(3,div(length(t),3))) + 1 
 
 triangles = []
-for i in FaceRing(1,faces)
+for i in FaceVRing(5,faces)
     #println("i")
     push!(triangles,i)
 end
 
-@test sort(triangles)==[3,4,8,9]
+@test sort(triangles)==[3,4,5,6,7,12,13,14]
+
+triverticies = []
+for i in DoubleVertexVRing(5,faces)
+    #println("i")
+    push!(triverticies,i)
+end
+
+@test (1,4) in triverticies
+
+verticies = []
+for i in VertexVRing(5,faces)
+    push!(verticies,i)
+end
+
+@test sort(verticies)==[1,4,7,8,9,10,11,12] #[1,2,6,7]
+
+println("Testing Complex DS")
+
+points = zeros(size(faces)...)
+fb = FaceBasedDS(faces)
+
+triangles = []
+for i in FaceVRing(5,fb)
+    push!(triangles,i)
+end
+@test sort(triangles)==[3,4,5,6,7,12,13,14]
+
+triverticies = []
+for i in DoubleVertexVRing(5,fb)
+    push!(triverticies,i)
+end
+
+@test (1,4) in triverticies
+
+verticies = []
+for i in VertexVRing(5,fb)
+     push!(verticies,i)
+end
+
+@test sort(verticies)==[1,4,7,8,9,10,11,12]
+
+println("Topology tests for Connectivity table")
+
+using JLD
+data = load("sphere.jld")
+faces = data["faces"]
+
+con = ConnectivityDS(faces,10)
+
+verticies = []
+for i in VertexVRing(1,con)
+    push!(verticies,i)
+end
+
+@test sort(verticies)==[2,4,5,14,15]
+
+triverticies = []
+for i in DoubleVertexVRing(1,con)
+    push!(triverticies,i)
+end
+
+@test (2,14) in triverticies
+
+# Here I will also have tests for connectivity table
 
 ##### Surface Properties ######
 
@@ -77,13 +143,18 @@ data = load("sphere.jld")
 points = data["points"]
 faces = data["faces"]
 
+n = Array(Float64,size(points)...)
+NormalVectors!(n,points,faces,i->FaceVRing(i,faces))
+curvatures = Array(Float64,size(points,2))
+MeanCurvatures!(curvatures,points,faces,n,i->FaceVRing(i,faces))
+
 angle = 0
 curvaturer = 0
 
 for xkey in 1:size(points,2)
-    iter = FaceRing(xkey,faces)
-    ncalc = vnormal(xkey,points,faces,iter)
-    ccalc = vcurvature(xkey,points,faces,iter,ncalc)
+    iter = FaceVRing(xkey,faces)
+    ncalc = n[:,xkey]
+    ccalc = curvatures[xkey]
 
     nT = points[:,xkey]/norm(points[:,xkey])
     angl = acos(dot(ncalc,nT))
@@ -100,27 +171,14 @@ end
 @test curvaturer < 0.01
 
 @test isapprox(volume(points,faces),4/3*pi,atol=0.05)
-@test isapprox(*(ellipsoid_parameters(points)...),1)
+@test isapprox(*(FitEllipsoid(points)...),1)
 
 ### And now integrators
 
 println("With Eigene test checking surface integrators")
 
 N = 100
-meth = AdamsStep
 PasiveStabilisation = false
 include("integrator.jl")
-@test SphereError(points) < 0.0001
-
-N = 10000
-meth = EilerStep
-PasiveStabilisation = false
-include("integrator.jl")
-@test SphereError(points) < 0.001
-
-N = 100
-meth = AdamsStep
-PasiveStabilisation = true
-include("integrator.jl")
-@test SphereError(points) < 0.0005
+@test SphereError(p2) < 0.0008
 

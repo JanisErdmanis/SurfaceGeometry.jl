@@ -14,97 +14,80 @@ function find_triangle_vertex{T<:Integer}(v::Integer,t::AbstractArray{T,2})
             return i
         end
     end
-    return size(t,2) # -1
+    return size(t,2) + 1 # -1
 end
 
-immutable FaceRing
+### Deprecaction Warnings
+FaceRing(v,faces) = error("Deprecated: use FaceVRing")
+FaceRingS(v,faces) = error("Deprecated: use DoubleVertexVRing")
+VeretexRing(v,faces) = error("Deprecated: use VertexVRing")
+
+immutable FaceVRing
     v::Int
     faces::Array{Int,2}
 end
 
+Base.start(iter::FaceVRing) = find_triangle_vertex(iter.v,iter.faces)
+Base.done(iter::FaceVRing,ti::Int) = ti<=size(iter.faces,2) ? false : true
 
-function Base.start(iter::FaceRing)
-    i = find_triangle_vertex(iter.v,iter.faces)
-    return i
-end
+function Base.next(iter::FaceVRing,i::Int)
 
-function Base.done(iter::FaceRing,i::Int)
-    if i<size(iter.faces,2)
-        return false
-    else
-        return true
-    end
-end
-
-function Base.next(iter::FaceRing,i::Int)
-
-    v = iter.v
+     v = iter.v
     nexti = find_triangle_vertex(iter.v,iter.faces[:,i+1:end]) + i  # possible botleneck here
     return i, nexti
 end
 
-
-### As example I will use FBDS iterators already written
-
-"""
-Iterator for getting all triangles around vertex
-"""
-immutable TriRing
+immutable DoubleVertexVRing
     v::Int
     faces::Array{Int,2}
-    neighs::Array{Int,2} ### For now keeping simple
-    vfaces::Array{Int,1}
-    
-    # function TriRing(v::Int,msh::TriGeom)
-
-    #     faces = msh.faces
-    #     neighs = msh.neighs
-    #     vfaces = msh.vfaces
-    #     new(v,faces,neighs,vfaces)
-    # end
-
-    # function TriRing(v::Int,faces::Array{Int,2},neighs::Array{Int,2},vfaces::Array{Int,1})
-    #     new(v,faces,neighs,vfaces)
-    # end
 end
 
+Base.start(iter::DoubleVertexVRing) = find_triangle_vertex(iter.v,iter.faces)
+Base.done(iter::DoubleVertexVRing,ti::Int) = ti<=size(iter.faces,2) ? false : true
 
+function Base.next(iter::DoubleVertexVRing,i::Int)
 
-function Base.start(iter::TriRing)
-    vface = iter.vfaces[iter.v]
-    i0 = 1
-    return (i0,vface)
-end
-
-function Base.done(iter::TriRing,state::Tuple{Int,Int})
-    i, face = state
-    i0, vface = start(iter)
-    if !(i==i0) & (face==vface)
-        return true
-    else
-        return false
-    end    
-end
-
-function Base.next(iter::TriRing,state::Tuple{Int,Int})
-
-    i, tri = state
     v = iter.v
-    face = iter.faces[:,tri]
-    neighbours = iter.neighs[:,tri]
-
-    index = face.==v
-    w = index[[1,2,3]]
-    cw = index[[3,1,2]]
-
-    nexttri, = neighbours[cw]
-
-    if nexttri==-1
-        error("The surface is not closed")
-    end
+    nexti = find_triangle_vertex(iter.v,iter.faces[:,i+1:end]) + i  # possible botleneck here
+    face = iter.faces[:,i]
+    w = face.==v
+    cw = w[[3,1,2]]
+    ccw = w[[2,3,1]]
     
-    return tri, (i+1,nexttri)
+    return (face[cw]...,face[ccw]...), nexti
 end
+
+### Unordered Veretex ring
+
+immutable VertexVRing
+    v::Int
+    faces::Array{Int,2}
+end
+
+Base.start(iter::VertexVRing) = find_triangle_vertex(iter.v,iter.faces)
+Base.done(iter::VertexVRing,ti::Int) = ti<=size(iter.faces,2) ? false : true
+
+function Base.next(iter::VertexVRing,ti::Int)
+
+    v = iter.v
+    faces = iter.faces
+    face = faces[:,ti]
+    cw = (face.==v)[[3,1,2]]
+    vi, = face[cw]
+        
+    nexti = find_triangle_vertex(iter.v,iter.faces[:,ti+1:end]) + ti  # possible botleneck
+    return vi, nexti
+end
+
+
+
+
+
+
+
+
+
+
 
 
 
