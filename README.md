@@ -104,4 +104,6 @@ end
 Eugene (incompressable velocity field proposed in [Eigene]]) test is being used for checking a need for stabilisation. For example without stabilisation we have a following picture:
 
 | ![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/OriginalField.gif) | ![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/NormalField.gif) | ![](https://github.com/akels/SurfaceGeometry.jl/blob/master/img/StabilisedField.gif) |
+|---|---|---|
+| | | |
 
