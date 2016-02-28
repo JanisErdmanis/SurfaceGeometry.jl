@@ -19,7 +19,6 @@ mesher = DistmeshSurfaceMesher()
 # And if you want to use CGAL insted
 # mesher = CGALSurfaceMesher()
 points, faces = EllipsoidMesh(a,b,c,mesher)
-
 ```
 Similarly you can use CGAL library only changing 2nd line of code above. CGAL mesher has four parameters - `AngularBound` the minimum allowed angle (Warning: stability for CGAL mesher is being (proven?) observed below 30 degrees), `RadiusBound`, `DistanceBound` measures the distance from faces to the meshed surface, `BoundingRadius` sets the bounds where object is going to be meshed. The interface to set theese parameters is `CGALSurfaceMesher(AngularBound,RadiusBound,DistanceBound,BoundingRadius)` or `CGALSurfaceMesher(;AngularBound=25)`. 
 
@@ -32,7 +31,6 @@ NormalVectors!(n,points,faces,i->FaceVRing(i,faces))
 
 curvatures = Array(size(points,2))
 MeanCurvatures!(curvatures,points,faces,n,i->FaceVRing(i,faces))
-
 ```
 where in the arguments `VertexVRing` and `FaceVRring` are vertex and face circulators discoussed more in next section. 
 
@@ -64,7 +62,6 @@ vertex = 1
 for i in VertexVRing(vertex,dataStructure)
     println("This is vertex $i")
 end
-
 ```
 Or you can choose connectivity data structure which for me have prooven to be by a facor of 10 faster
 ```
@@ -106,5 +103,9 @@ end
 
 Eugene (incompressable velocity field proposed in [Eigene]]) test is being used for checking a need for stabilisation. For example without stabilisation we have a following picture:
 
-![]()
+![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/OriginalField.gif)
+
+![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/NormalField.gif)
+
+![](https://github.com/akels/SurfaceGeometry.jl/blob/master/img/StabilisedField.gif)
 
