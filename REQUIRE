@@ -3,3 +3,4 @@ ForwardDiff
 PyCall
 MATLAB
 JLD
+Optim
