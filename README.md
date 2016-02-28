@@ -4,7 +4,7 @@ Library for triangular surface mesh generation, stabilisation and surface parame
 
 ## Future directions
 
-- [ ] Implenent general kind of mesh generator with CGAL by passing signed distance function from julia 
+- [x] Implenent general kind of mesh generator with CGAL by passing signed distance function from julia 
 - [ ] Sphere mesh generation with Octahedron
 - [ ] Mesh subdivision method
 - [ ] Interfacing remesher from http://www.gris.informatik.tu-darmstadt.de/~sfuhrman/remesher.html which would solve bad initial mesh form CGAL
@@ -12,15 +12,19 @@ Library for triangular surface mesh generation, stabilisation and surface parame
 
 ## Mesh Generation
 
-For now only ellipsoid mesh can be generated with Distmesh or CGAL library. Distmesh accepts one parameter `step` which charecterizes the edge length of triangular element which is stored in object with type `DistmeshSurfaceMesher`. The interface to genrate the mesh so is
+A surface mesh is generated with CGAL by giving signed distance function for `SurfaceMesher` which is negative in body and positive outside. The interface to generate triangular mesh for sphere so is
+```
+fdis(x,y,z) = x^2 + y^2 + z^2 - 1
+points, faces = SurfaceMesh(fdis,CGALSurfaceMesher())
+```
+CGAL mesher has four parameters - `AngularBound` the minimum allowed angle (Warning: stability for CGAL mesher is being (proven?) observed below 30 degrees), `RadiusBound`, `DistanceBound` measures the distance from faces to the meshed surface, `BoundingRadius` sets the bounds where object is going to be meshed. The interface to set theese parameters is `CGALSurfaceMesher(AngularBound,RadiusBound,DistanceBound,BoundingRadius)` or `CGALSurfaceMesher(;AngularBound=25)`. 
+
+The library interfaces Distmesh to generate ellipsodial mesh. For now it much higher qulity surface meshes, but lacks of stability to converge. `DistmeshSurfaceMesher` has one parameter `step` which charetirizes a typical edge length. A typical example to use it is as follows
 ```
 a,b,c = 2,1,1
 mesher = DistmeshSurfaceMesher()
-# And if you want to use CGAL insted
-# mesher = CGALSurfaceMesher()
 points, faces = EllipsoidMesh(a,b,c,mesher)
 ```
-Similarly you can use CGAL library only changing 2nd line of code above. CGAL mesher has four parameters - `AngularBound` the minimum allowed angle (Warning: stability for CGAL mesher is being (proven?) observed below 30 degrees), `RadiusBound`, `DistanceBound` measures the distance from faces to the meshed surface, `BoundingRadius` sets the bounds where object is going to be meshed. The interface to set theese parameters is `CGALSurfaceMesher(AngularBound,RadiusBound,DistanceBound,BoundingRadius)` or `CGALSurfaceMesher(;AngularBound=25)`. 
 
 ## Estimation of surface parameters
 
