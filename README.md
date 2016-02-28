@@ -1,3 +1,5 @@
+![](https://travis-ci.org/akels/SurfaceGeometry.jl.svg?branch=master)
+
 # SurfaceGeometry
 
 Library for triangular surface mesh generation, stabilisation and surface parameter estimation. It is intended to be used as surface velocity integrator for boundary element method, so I it also includes vertex normal, curvature calculation and also circulators. 
