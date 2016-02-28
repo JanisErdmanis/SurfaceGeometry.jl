@@ -105,5 +105,5 @@ Eugene (incompressable velocity field proposed in [Eigene]]) test is being used 
 
 | ![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/OriginalField.gif) | ![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/NormalField.gif) | ![](https://github.com/akels/SurfaceGeometry.jl/blob/master/img/StabilisedField.gif) |
 |---|---|---|
-| | | |
+| Original velocity field | Normal component of it | Stabilisation of velocity normal component |
 
