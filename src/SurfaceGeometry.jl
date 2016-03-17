@@ -3,7 +3,7 @@ module SurfaceGeometry
 include("MeshGenerationMethods/Utils.jl")
 include("MeshGenerationMethods/CGAL.jl")
 include("MeshGenerationMethods/Distmesh.jl")
-export EllipsoidMesh, SurfaceMesh, volume, DistmeshSurfaceMesher, CGALSurfaceMesher
+export EllipsoidMesh, SurfaceMesh, volume, DistmeshSurfaceMesher, CGALSurfaceMesher, subdivision
 
 include("Iterators.jl")
 include("ComplexDS.jl")

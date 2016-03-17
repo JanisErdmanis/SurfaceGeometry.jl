@@ -7,8 +7,8 @@ Library for triangular surface mesh generation, stabilisation and surface parame
 ## Future directions
 
 - [x] Implenent general kind of mesh generator with CGAL by passing signed distance function from julia 
-- [ ] Sphere mesh generation with Octahedron
-- [ ] Mesh subdivision method
+- [-] Sphere mesh generation with Octahedron
+- [x] Mesh subdivision method
 - [ ] Interfacing remesher from http://www.gris.informatik.tu-darmstadt.de/~sfuhrman/remesher.html which would solve bad initial mesh form CGAL
 - [ ] Interface for Eltopo library allowing to handle more extreme deformations
 
@@ -26,6 +26,17 @@ The library interfaces Distmesh to generate ellipsodial mesh. For now it much hi
 a,b,c = 2,1,1
 mesher = DistmeshSurfaceMesher()
 points, faces = EllipsoidMesh(a,b,c,mesher)
+```
+
+To obtain finer mesh a `subdivision` method can be used. Positions of the new introduced edge nodes can be calculated either by interpolation which can be pushed to real surface if signed distance function is given as argument. The interface for the function 
+```
+# creates only reffined topology of faces as rfaces
+rfaces = subdivision(faces)
+# subdivide and calculate positions of new nodes with linear or paraboloid interpolation 
+rponts, rfaces = subdivision(points,faces,method=:linear)
+rponts, rfaces = subdivision(points,faces,method=:paraboloid)
+# subdivide surface with linear interpolation and push nodes (gradient decent) to the real surface
+rponts, rfaces = subdivision(points,faces,x -> x[1]^2 + x[2]^2 + x[3]^2 - 1)
 ```
 
 ## Estimation of surface parameters

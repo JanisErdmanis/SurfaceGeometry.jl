@@ -82,3 +82,129 @@ function isoriented{T <: AbstractFloat, S <: Integer}(points::Array{T,2},triangl
     end
 end
 
+
+function subdivision(faces)
+    edges = []
+
+    for ti in 1:size(faces,2)
+        v1,v2,v3 = faces[:,ti]
+
+        v2<v1 || push!(edges,(v1,v2))
+        v3<v2 || push!(edges,(v2,v3))
+        v1<v3 || push!(edges,(v3,v1))
+    end
+
+
+    rfaces = Array(Int,3,size(faces,2)*4)
+    N = maximum(faces)
+
+    for ti in 1:size(faces,2)
+
+        v1,v2,v3 = faces[:,ti]
+        e3 = findfirst(edges,v2>v1 ? (v1,v2) : (v2,v1)) + N 
+        e1 = findfirst(edges,v3>v2 ? (v2,v3) : (v3,v2)) + N 
+        e2 = findfirst(edges,v1>v3 ? (v3,v1) : (v1,v3)) + N 
+
+        rfaces[:,4*ti - 3] = [v1,e3,e2]
+        rfaces[:,4*ti - 2] = [v2,e1,e3]
+        rfaces[:,4*ti - 1] = [v3,e2,e1]
+        rfaces[:,4*ti] = [e1,e2,e3]
+    end
+
+    return rfaces    
+end
+
+function subdivision(points,faces; n=1,method=:linear)
+    if method==:linear
+        rpoints,rfaces = LinearSubdivision(points,faces)
+    elseif method==:paraboloid
+        rpoints,rfaces = ParaboloidSubdivision(points,faces)
+    end
+
+    return rpoints,rfaces
+end
+
+function LinearSubdivision(points,faces)
+
+    rfaces = subdivision(faces)
+    rpoints = Array(Float64,3,maximum(rfaces))
+
+    for ti in 1:size(faces,2)
+
+        v1,v2,v3 = faces[:,ti]
+        e1,e2,e3 = rfaces[:,4*ti]
+
+        rpoints[:,v1] = points[:,v1]
+        rpoints[:,v2] = points[:,v2]
+        rpoints[:,v3] = points[:,v3]
+        rpoints[:,e1] = (points[:,v2] + points[:,v3])/2
+        rpoints[:,e2] = (points[:,v1] + points[:,v3])/2
+        rpoints[:,e3] = (points[:,v1] + points[:,v2])/2
+    end
+
+    return rpoints,rfaces
+end
+
+
+function ParaboloidSubdivision(points,faces)
+
+    normals = Array(Float64,size(points)...)
+    NormalVectors!(normals,points,faces,i->FaceVRing(i,faces))
+    
+    rfaces = subdivision(faces)
+    rpoints = Array(Float64,3,maximum(rfaces))
+
+    vproperties = []
+    for xkey in 1:size(points,2)
+
+        x = points[:,xkey]
+        nx = normals[:,xkey]
+        
+        vects = Float64[]
+        for i in VertexVRing(xkey,faces)
+            vi = points[:,i] - x
+            vects = [vects..., vi...]
+        end
+        vects = reshape(vects,3,div(length(vects),3))
+
+        R = eye(3)
+        C,D,E = SurfaceGeometry.ZinchenkoDifertential!(vects,nx,R)
+
+        push!(vproperties,(C,D,E,R))
+    end
+
+    z(x,y,C,D,E) = C*x^2 + D*x*y + E*y^2
+    pushon(x,C,D,E,R) = ((xp,yp,zp) = R*x; inv(R)*[xp,yp,z(xp,yp,C,D,E)])
+    
+    for ti in 1:size(faces,2)
+        v1,v2,v3 = faces[:,ti]
+        e1,e2,e3 = rfaces[:,4*ti]
+
+        rpoints[:,v1] = points[:,v1]
+        rpoints[:,v2] = points[:,v2]
+        rpoints[:,v3] = points[:,v3]
+
+        ### It gets overwritten once        
+        xe1 = (points[:,v2] + points[:,v3])/2
+        rpoints[:,e1] = xe1 + (pushon(xe1-points[:,v2],vproperties[v2]...) + pushon(xe1-points[:,v3],vproperties[v3]...))/2
+
+        xe2 = (points[:,v3] + points[:,v1])/2
+        rpoints[:,e2] = xe2 + (pushon(xe2-points[:,v1],vproperties[v1]...) + pushon(xe2-points[:,v3],vproperties[v3]...))/2
+
+        xe3 = (points[:,v1] + points[:,v2])/2
+        rpoints[:,e3] = xe3 + (pushon(xe3-points[:,v1],vproperties[v1]...) + pushon(xe3-points[:,v2],vproperties[v2]...))/2
+    end
+
+    return rpoints,rfaces
+end
+
+"Subdivision of surface and pushback"
+function subdivision(points,faces,sdist::Function)
+    rpoints,rfaces = LinearSubdivision(points,faces)
+
+    for i in 1:size(rpoints,2)
+        rpoints[:,i] = pushback(sdist,rpoints[:,i])
+    end
+
+    return rpoints,rfaces
+end
