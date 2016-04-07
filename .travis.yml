@@ -2,7 +2,7 @@
 
 before_install:
     - sudo apt-get -qq update
-    - sudo apt-get install -y libcgal-dev
+    - sudo apt-get install -y libcgal-dev liblapack-dev libblas-dev
   
 language: julia
 os:
