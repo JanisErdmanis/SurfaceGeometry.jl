@@ -7,5 +7,5 @@ eltopo: copydefs
 	cd $(ElTopoDIR)/eltopo3d && make depend && make release
 
 eltopowrap: eltopo.cpp eltopo
-	g++ eltopo.cpp $(ElTopoDIR)/eltopo3d/libeltopo_release.a -o eltopo.so -fPIC -std=c++11 -shared -llapack -lblas -lstdc++ -lm -I$(ElTopoDIR)/common -I$(ElTopoDIR)/eltopo3d 
+	g++ eltopo.cpp $(ElTopoDIR)/eltopo3d/libeltopo_release.a -o eltopo.so -fPIC -shared -llapack -lblas -lstdc++ -lm -I$(ElTopoDIR)/common -I$(ElTopoDIR)/eltopo3d 
 
