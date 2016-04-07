@@ -33,6 +33,8 @@ function stabilise(points,faces,v;method=:Zinchenko2013,vp=zeros(size(points)...
         zc = Zinchenko2013(points,faces,n)
     elseif method==:Zinchenko1997
         zc = Zinchenko1997(i -> VertexVRing(i,faces))
+    else
+        zc = method   ### For construction outside the usual 
     end
 
     vres = copy(v)

@@ -11,12 +11,14 @@ export FaceBasedDS, ConnectivityDS
 export FaceVRing, VertexVRing, DoubleVertexVRing
 
 include("Properties.jl")
-export NormalVectors!, MeanCurvatures!, FitEllipsoid,
+export NormalVectors!, MeanCurvatures!, FitEllipsoid, volume
 
-i### Essential from stabilistation
+### Essential from stabilistation
 include("StabilisationMethods/stabilisationV1.jl")
 include("StabilisationMethods/stabilisationV2.jl")
 include("StabilisationMethods/Stabilisation.jl")
-export stabilise
+include("StabilisationMethods/ElTopo.jl")
+
+export stabilise, improvemesh, Elparameters
 
 end # module

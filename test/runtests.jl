@@ -39,7 +39,6 @@ fdis(x,y,z) = x^2 + y^2 + z^2 - 1
 points, faces = SurfaceMesh(fdis,mesher)
 @test SphereError(points) < 0.01
 
-
 ### Matlab mesh generator
 println("Mesh generation with distmesh")
 try
@@ -180,4 +179,16 @@ N = 100
 PasiveStabilisation = false
 include("integrator.jl")
 @test SphereError(p2) < 0.0008
+
+### ElTopo mesh stabilisation
+
+mesher = CGALSurfaceMesher()
+fdis(x,y,z) = x^2 + y^2 + z^2 - 1
+p,t = SurfaceMesh(fdis,mesher)
+
+par = Elparameters()
+inmsh_verticies = 0.15*p .+ [0.35,0.35,0.35]
+inmsh_triangles = map(Int32,t) - 1
+
+points, faces = improvemesh(inmsh_verticies,inmsh_triangles,par)
 

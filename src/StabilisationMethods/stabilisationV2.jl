@@ -5,9 +5,10 @@ immutable Zinchenko2013{T<:AbstractFloat}
     gamma::AbstractFloat 
     C::AbstractFloat
     h2::Vector{T}
+    ftol::AbstractFloat
 end
 
-function Zinchenko2013(points,faces,n;gamma=0.25,C=0.4)
+function Zinchenko2013(points,faces,n;gamma=0.25,Cp=0.4,ftol=1e-6)
 
     function VArea(vi)
         area = 0
@@ -59,12 +60,13 @@ function Zinchenko2013(points,faces,n;gamma=0.25,C=0.4)
         h2[i] = K*Lambda[i]^(-gamma)
     end
 
-    Zinchenko2013(gamma,C,h2)
+    Zinchenko2013(gamma,Cp,h2,ftol)
 end
 
 
 function F(points,faces,v,zc::Zinchenko2013)
 
+    Cp = zc.C
     h2 = zc.h2
     
     s = 0    
@@ -89,7 +91,7 @@ function F(points,faces,v,zc::Zinchenko2013)
         C = 1/4/Cdelta/(a^2 + b^2 + c^2)^3 * ( c^2*(a^2 + b^2 + c^2) - a^4 - b^4 - c^4)
         DCdelta = -A*xava - B*xbvb - C*xcvc
 
-        s += 0.4*DCdelta^2/Cdelta^2
+        s += Cp*DCdelta^2/Cdelta^2
     end
 
     return s
@@ -97,6 +99,7 @@ end
 
 function gradF!(points,faces,v,storage,zc::Zinchenko2013)
 
+    Cp = zc.C
     h2 = zc.h2
 
     storage[:,:] = 0
@@ -122,9 +125,9 @@ function gradF!(points,faces,v,storage,zc::Zinchenko2013)
         hb2 = (h2[v3] + h2[v2])/2
         hc2 = (h2[v1] + h2[v3])/2
         
-        A_ = 2*0.4*DCdelta*A/Cdelta^2 
-        B_ = 2*0.4*DCdelta*B/Cdelta^2 
-        C_ = 2*0.4*DCdelta*C/Cdelta^2 
+        A_ = 2*Cp*DCdelta*A/Cdelta^2 
+        B_ = 2*Cp*DCdelta*B/Cdelta^2 
+        C_ = 2*Cp*DCdelta*C/Cdelta^2 
 
         xa = points[:,v2] - points[:,v1]
         xb = points[:,v3] - points[:,v2]
@@ -147,7 +150,6 @@ function stabilise!(points,faces,n,v,zc::Zinchenko2013; op=:optim)
     end
 end
 
-    
 
 function stabiliseV2Optim!(points,faces,n,v,zc::Zinchenko2013)
     #h2 = hvec(points,faces,n)
@@ -171,7 +173,7 @@ function stabiliseV2Optim!(points,faces,n,v,zc::Zinchenko2013)
         end
     end
 
-    res = optimize(f,g!,v[:],method=:cg,ftol=1e-6)
+    res = optimize(f,g!,v[:],method=:cg,ftol=zc.ftol)
     v[:,:] = reshape(res.minimum, size(v)...)[:,:]
 end
 

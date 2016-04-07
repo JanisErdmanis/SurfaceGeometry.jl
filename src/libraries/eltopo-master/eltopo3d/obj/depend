@@ -1,0 +1,135 @@
+obj/accelerationgrid.o: accelerationgrid.cpp accelerationgrid.h \
+ ../common/array3.h ../common/array1.h ../common/vec.h \
+ ../common/hashtable.h ../common/util.h ../common/wallclocktime.h
+obj/broadphasegrid.o: broadphasegrid.cpp broadphasegrid.h broadphase.h \
+ ../common/vec.h ../common/hashtable.h ../common/util.h \
+ ../common/array3.h ../common/array1.h accelerationgrid.h \
+ dynamicsurface.h collisionpipeline.h options.h ../common/commonoptions.h \
+ nondestructivetrimesh.h
+obj/collisionpipeline.o: collisionpipeline.cpp collisionpipeline.h \
+ options.h ../common/commonoptions.h ../common/vec.h \
+ ../common/hashtable.h ../common/util.h ../common/array3.h \
+ ../common/array1.h broadphase.h ../common/ccd_wrapper.h \
+ ../common/collisionqueries.h dynamicsurface.h nondestructivetrimesh.h \
+ impactzonesolver.h ../common/runstats.h ../common/wallclocktime.h
+obj/dynamicsurface.o: dynamicsurface.cpp dynamicsurface.h broadphase.h \
+ ../common/vec.h ../common/hashtable.h ../common/util.h \
+ ../common/array3.h ../common/array1.h collisionpipeline.h options.h \
+ ../common/commonoptions.h nondestructivetrimesh.h broadphasegrid.h \
+ accelerationgrid.h ../common/ccd_wrapper.h ../common/collisionqueries.h \
+ impactzonesolver.h ../common/lapack_wrapper.h ../common/mat.h \
+ ../common/runstats.h ../common/wallclocktime.h
+obj/edgecollapser.o: edgecollapser.cpp edgecollapser.h meshoperator.h \
+ ../common/commonoptions.h ../common/vec.h ../common/hashtable.h \
+ ../common/util.h ../common/array3.h ../common/array1.h broadphase.h \
+ collisionpipeline.h options.h ../common/collisionqueries.h \
+ nondestructivetrimesh.h ../common/runstats.h subdivisionscheme.h \
+ surftrack.h dynamicsurface.h edgeflipper.h edgesplitter.h meshmerger.h \
+ meshpincher.h meshsmoother.h trianglequality.h
+obj/edgeflipper.o: edgeflipper.cpp edgeflipper.h meshoperator.h \
+ ../common/commonoptions.h broadphase.h ../common/vec.h \
+ ../common/hashtable.h ../common/util.h ../common/array3.h \
+ ../common/array1.h ../common/ccd_wrapper.h ../common/collisionqueries.h \
+ collisionpipeline.h options.h nondestructivetrimesh.h \
+ ../common/runstats.h surftrack.h dynamicsurface.h edgecollapser.h \
+ edgesplitter.h meshmerger.h meshpincher.h meshsmoother.h \
+ trianglequality.h
+obj/edgesplitter.o: edgesplitter.cpp edgesplitter.h meshoperator.h \
+ ../common/commonoptions.h broadphase.h ../common/vec.h \
+ ../common/hashtable.h ../common/util.h ../common/array3.h \
+ ../common/array1.h ../common/ccd_wrapper.h ../common/collisionqueries.h \
+ ../common/runstats.h subdivisionscheme.h surftrack.h dynamicsurface.h \
+ collisionpipeline.h options.h nondestructivetrimesh.h edgecollapser.h \
+ edgeflipper.h meshmerger.h meshpincher.h meshsmoother.h \
+ trianglequality.h
+obj/eltopo.o: eltopo.cpp eltopo.h surftrack.h dynamicsurface.h \
+ broadphase.h ../common/vec.h ../common/hashtable.h ../common/util.h \
+ ../common/array3.h ../common/array1.h collisionpipeline.h options.h \
+ ../common/commonoptions.h nondestructivetrimesh.h edgecollapser.h \
+ meshoperator.h edgeflipper.h edgesplitter.h meshmerger.h meshpincher.h \
+ meshsmoother.h
+obj/impactzonesolver.o: impactzonesolver.cpp collisionpipeline.h \
+ options.h ../common/commonoptions.h ../common/vec.h \
+ ../common/hashtable.h ../common/util.h ../common/array3.h \
+ ../common/array1.h ../common/ccd_wrapper.h dynamicsurface.h broadphase.h \
+ nondestructivetrimesh.h impactzonesolver.h \
+ ../common/newsparse/krylov_solvers.h \
+ ../common/newsparse/linear_operator.h ../common/mat.h \
+ ../common/newsparse/sparse_matrix.h ../common/blas_wrapper.h \
+ ../common/runstats.h
+obj/meshmerger.o: meshmerger.cpp meshmerger.h meshoperator.h \
+ ../common/commonoptions.h ../common/vec.h ../common/hashtable.h \
+ ../common/util.h ../common/array3.h ../common/array1.h broadphase.h \
+ collisionpipeline.h options.h ../common/collisionqueries.h \
+ ../common/runstats.h surftrack.h dynamicsurface.h \
+ nondestructivetrimesh.h edgecollapser.h edgeflipper.h edgesplitter.h \
+ meshpincher.h meshsmoother.h
+obj/meshpincher.o: meshpincher.cpp meshpincher.h meshoperator.h \
+ ../common/commonoptions.h ../common/vec.h ../common/hashtable.h \
+ ../common/util.h ../common/array3.h ../common/array1.h broadphase.h \
+ collisionpipeline.h options.h surftrack.h dynamicsurface.h \
+ nondestructivetrimesh.h edgecollapser.h edgeflipper.h edgesplitter.h \
+ meshmerger.h meshsmoother.h
+obj/meshsmoother.o: meshsmoother.cpp meshsmoother.h meshoperator.h \
+ ../common/commonoptions.h impactzonesolver.h collisionpipeline.h \
+ options.h ../common/vec.h ../common/hashtable.h ../common/util.h \
+ ../common/array3.h ../common/array1.h ../common/lapack_wrapper.h \
+ ../common/mat.h nondestructivetrimesh.h surftrack.h dynamicsurface.h \
+ broadphase.h edgecollapser.h edgeflipper.h edgesplitter.h meshmerger.h \
+ meshpincher.h
+obj/meshrenderer.o: meshrenderer.cpp meshrenderer.h ../common/vec.h \
+ ../common/hashtable.h ../common/util.h ../common/array3.h \
+ ../common/array1.h
+obj/nondestructivetrimesh.o: nondestructivetrimesh.cpp \
+ nondestructivetrimesh.h options.h ../common/commonoptions.h \
+ ../common/vec.h ../common/hashtable.h ../common/util.h \
+ ../common/array3.h ../common/array1.h ../common/wallclocktime.h
+obj/subdivisionscheme.o: subdivisionscheme.cpp subdivisionscheme.h \
+ ../common/vec.h ../common/hashtable.h ../common/util.h \
+ ../common/array3.h ../common/array1.h ../common/mat.h surftrack.h \
+ dynamicsurface.h broadphase.h collisionpipeline.h options.h \
+ ../common/commonoptions.h nondestructivetrimesh.h edgecollapser.h \
+ meshoperator.h edgeflipper.h edgesplitter.h meshmerger.h meshpincher.h \
+ meshsmoother.h
+obj/surftrack.o: surftrack.cpp surftrack.h dynamicsurface.h broadphase.h \
+ ../common/vec.h ../common/hashtable.h ../common/util.h \
+ ../common/array3.h ../common/array1.h collisionpipeline.h options.h \
+ ../common/commonoptions.h nondestructivetrimesh.h edgecollapser.h \
+ meshoperator.h edgeflipper.h edgesplitter.h meshmerger.h meshpincher.h \
+ meshsmoother.h ../common/ccd_wrapper.h ../common/collisionqueries.h \
+ impactzonesolver.h ../common/lapack_wrapper.h ../common/runstats.h \
+ subdivisionscheme.h trianglequality.h ../common/wallclocktime.h
+obj/trianglequality.o: trianglequality.cpp trianglequality.h \
+ ../common/vec.h ../common/hashtable.h ../common/util.h \
+ ../common/array3.h ../common/array1.h surftrack.h dynamicsurface.h \
+ broadphase.h collisionpipeline.h options.h ../common/commonoptions.h \
+ nondestructivetrimesh.h edgecollapser.h meshoperator.h edgeflipper.h \
+ edgesplitter.h meshmerger.h meshpincher.h meshsmoother.h
+obj/wallclocktime.o: ../common/wallclocktime.cpp \
+ ../common/wallclocktime.h
+obj/sparse_matrix.o: ../common/newsparse/sparse_matrix.cpp \
+ ../common/newsparse/sparse_matrix.h ../common/blas_wrapper.h \
+ ../common/newsparse/linear_operator.h ../common/util.h \
+ ../common/array3.h ../common/array1.h
+obj/krylov_solvers.o: ../common/newsparse/krylov_solvers.cpp \
+ ../common/newsparse/krylov_solvers.h \
+ ../common/newsparse/linear_operator.h ../common/blas_wrapper.h
+obj/expansion.o: ../common/tunicate/expansion.cpp \
+ ../common/tunicate/expansion.h ../common/commonoptions.h
+obj/intersection.o: ../common/tunicate/intersection.cpp \
+ ../common/tunicate/tunicate.h
+obj/neg.o: ../common/tunicate/neg.cpp ../common/tunicate/neg.h
+obj/orientation.o: ../common/tunicate/orientation.cpp \
+ ../common/tunicate/fenv_include.h ../common/tunicate/tunicate.h \
+ ../common/tunicate/expansion.h ../common/commonoptions.h \
+ ../common/tunicate/neg.h
+obj/root_parity_ccd_wrapper.o: ../common/root_parity_ccd_wrapper.cpp \
+ ../common/ccd_defs.h
+obj/cubic_ccd_wrapper.o: ../common/cubic_ccd_wrapper.cpp \
+ ../common/ccd_defs.h ../common/ccd_wrapper.h ../common/vec.h \
+ ../common/hashtable.h ../common/util.h ../common/array3.h \
+ ../common/array1.h ../common/collisionqueries.h
+obj/collisionqueries.o: ../common/collisionqueries.cpp \
+ ../common/collisionqueries.h ../common/vec.h ../common/hashtable.h \
+ ../common/util.h ../common/array3.h ../common/array1.h \
+ ../common/commonoptions.h
