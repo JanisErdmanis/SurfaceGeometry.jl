@@ -56,8 +56,6 @@ using Parameters
     m_verbose::Bool = false
 end
 
-using Storage
-
 const libpath = Pkg.dir("SurfaceGeometry","src","libraries","eltopo-wrapper") * "/eltopo.so"
 
 function improvemesh(verticies,triangles,par)
