@@ -149,7 +149,8 @@ m_dt = h
 actualdt,p,f = improvemeshcol(p,f,p + h*v2,par) 
 ```
 where names of parameters is kept the same as in ElTopo library. Integrating further normal component of Enright velocity field shows that this topology stabilisation complements passive stabilisation.
-| ![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/topologystab.svg) | ![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/thinfeatures.svg)  |
+
+| ![](https://rawgit.com/akels/SurfaceGeometry.jl/master/img/topologystab.svg) | ![](https://rawgit.com/akels/SurfaceGeometry.jl/master/img/thinfeatures.svg)  |
 |---|---|
 | Evolution of mesh | View which shows that thin features are preserved |
 
