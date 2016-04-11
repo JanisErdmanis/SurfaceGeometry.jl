@@ -125,7 +125,7 @@ Enright (incompressable velocity field proposed in [Enright]]) test is being use
 
 ## Topology Stabilisation
 
-Passive stabilisation make "badness" of triangles distributed evenly with adjustment of tangential velocity. So when most of triangles are bad mesh surgery must be used to avoid degeneration. Here I have interfaced ![ElTopo](https://github.com/tysonbrochu/eltopo) library which can be as follows:
+Passive stabilisation make "badness" of triangles distributed evenly with adjustment of tangential velocity. So when most of triangles are bad mesh surgery must be used to avoid degeneration. Here I have interfaced ElTopo library which can be as follows:
 ```
 scale = 0.2
 par = Elparameters(
