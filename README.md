@@ -99,9 +99,7 @@ In this way it is however more likely to experience the degeneration of triangle
 
 Here we use "kinetic" energy minimization function similar to [Zinchenko1997] and [Zinchenko2013]
 
-![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/pasivestabilisation.svg)
-
-<img src="https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/pasivestabilisation.svg">
+![](https://rawgit.com/akels/SurfaceGeometry.jl/master/img/pasivestabilisation.svg)
 
 which when minimized for tangential velocities keeps mesh good at next time step. To use this stabilisation algorithm for your surface evolution incoorporate it in your integrator as follows:
 ```
