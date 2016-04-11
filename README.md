@@ -6,11 +6,7 @@ Library for triangular surface mesh generation, stabilisation and surface parame
 
 ## Future directions
 
-- [x] Implenent general kind of mesh generator with CGAL by passing signed distance function from julia 
-- [-] Sphere mesh generation with Octahedron
-- [x] Mesh subdivision method
-- [ ] Interfacing remesher from http://www.gris.informatik.tu-darmstadt.de/~sfuhrman/remesher.html which would solve bad initial mesh form CGAL
-- [ ] Interface for Eltopo library allowing to handle more extreme deformations
+- [ ] Interfacing remesher from http://www.gris.informatik.tu-darmstadt.de/~sfuhrman/remesher.html which should solve bad initial mesh form CGAL
 
 ## Mesh Generation
 
@@ -86,7 +82,7 @@ valence = 7
 dataStructure = ConnectivityDS(faces,valence)
 ```
 
-## Surface velocity field integration and stabilisation
+## Surface velocity field stabilisation
 
 Assuming that velocity function is given as `velocity(t,points,faces)` the integration for points with Euler method would look like
 ```
@@ -99,9 +95,11 @@ for i in 1:10
     p += h*v
 end 
 ```
-In this way it is however more likely to experience the degeneration of triangles as surface evolves. To deal with it we can seperate normal and tangential velocity where the later one can be adjusted for keeping good mesh.
+In this way it is however more likely to experience the degeneration of triangles as surface evolves. To deal with it we can adjust tangential velocity for keeping a good mesh or also making topology changes.
 
-Here we use "kinetic" energy minimization function to find tangential velocity as [Zinchenko1997] and [Zinchenko2013] had used (the springs with damping also are quite popular [Cristini]). The interface to integrate above with stabilisation is as follows
+Here we use "kinetic" energy minimization function similar to [Zinchenko1997] and [Zinchenko2013]
+![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/pasivestabilisation.svg)
+which when minimized for tangential velocities keeps mesh good at next time step. To use this stabilisation algorithm for your surface evolution incoorporate it in your integrator as follows:
 ```
 t = 0
 h = 0.1
@@ -117,10 +115,44 @@ for i in 1:10
     p += h*v
 end 
 ```
-
-Eugene (incompressable velocity field proposed in [Eigene]]) test is being used for checking a need for stabilisation. For example without stabilisation we have a following picture:
+Enright (incompressable velocity field proposed in [Enright]]) test is being used for checking the need for stabilisation:
 
 | ![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/OriginalField.gif) | ![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/NormalField.gif) | ![](https://github.com/akels/SurfaceGeometry.jl/blob/master/img/StabilisedField.gif) |
 |---|---|---|
 | Original velocity field | Normal component of it | Stabilisation of velocity normal component |
+
+## Topology Stabilisation
+
+Passive stabilisation make "badness" of triangles distributed evenly with adjustment of tangential velocity. So when most of triangles are bad mesh surgery must be used to avoid degeneration. Here I have interfaced ![ElTopo](https://github.com/tysonbrochu/eltopo) library which can be as follows:
+```
+scale = 0.2
+par = Elparameters(
+                   m_use_fraction = false,
+                   m_min_edge_length = 0.7*scale,
+                   m_max_edge_length = 1.5*scale,
+                   m_max_volume_change = 0.1*scale^3,
+                   m_min_curvature_multiplier = 1.0,
+                   m_max_curvature_multiplier = 1.0,
+                   m_merge_proximity_epsilon = 0.5*scale,
+                   m_proximity_epsilon = 0.00001,
+m_perform_improvement = true, 
+m_collision_safety = false,
+m_min_triangle_angle = 15,
+m_max_triangle_angle = 120,
+m_allow_vertex_movement = true,
+m_use_curvature_when_collapsing = false,
+m_use_curvature_when_splitting = false,
+m_dt = h
+)
+actualdt,p,f = improvemeshcol(p,f,p + h*v2,par) 
+```
+where names of parameters is kept the same as in ElTopo library. Integrating further normal component of Enright velocity field shows that this topology stabilisation complements passive stabilisation.
+| ![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/topologystab.svg) | ![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/thinfeatures.svg)  |
+|---|---|
+| Evolution of mesh | View which shows that thin features are preserved |
+
+
+
+
+
 

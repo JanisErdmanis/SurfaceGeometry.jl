@@ -31,9 +31,9 @@ function main(window)
            initscene() <<
            [
             # For presentations
-            ThreeJS.mesh(0.0, 0.0, 0.0) << [ geometry(ConvertToTuple(points,faces)...), material(Dict(:color=>"white",:kind=>"basic")) ],
-            ThreeJS.mesh(0.0, 0.0, 0.0) << [ geometry(ConvertToTuple(points,faces)...), material(Dict(:color=>"black",:wireframe=>true,:kind=>"basic")) ],
-            #ThreeJS.mesh(0.0, 0.0, 0.0) << [ geometry(ConvertToTuple(points,faces)...), material(Dict(:color=>"red",:kind=>"lambert")) ],    
+            # ThreeJS.mesh(0.0, 0.0, 0.0) << [ geometry(ConvertToTuple(points,faces)...), material(Dict(:color=>"white",:kind=>"basic")) ],
+            # ThreeJS.mesh(0.0, 0.0, 0.0) << [ geometry(ConvertToTuple(points,faces)...), material(Dict(:color=>"black",:wireframe=>true,:kind=>"basic")) ],
+            ThreeJS.mesh(0.0, 0.0, 0.0) << [ geometry(ConvertToTuple(points,faces)...), material(Dict(:color=>"red",:kind=>"normal")) ],    
     #            pointlight(0.,10.,0.),
             camera(10.0, 0., 0.),
            ]

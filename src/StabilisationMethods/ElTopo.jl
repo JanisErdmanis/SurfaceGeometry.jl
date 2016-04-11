@@ -1,4 +1,4 @@
-NSIZE = 4000
+NSIZE = 100000
 
 using Parameters
 @with_kw type Elparameters
@@ -22,7 +22,7 @@ using Parameters
     m_max_volume_change::Float64 = 0.1
     
     #// In-triangle angles to enforce
-    m_min_triangle_angle::Float64 = 35
+    m_min_triangle_angle::Float64 = 0
     m_max_triangle_angle::Float64 = 180   
     
     m_use_curvature_when_splitting::Bool = false
@@ -54,12 +54,15 @@ using Parameters
 
     #// Printing out a bunch of stuff
     m_verbose::Bool = false
+
+    m_dt::Float64 = 0
 end
 
 const libpath = Pkg.dir("SurfaceGeometry","src","libraries","eltopo-wrapper") * "/eltopo.so"
 
 function improvemesh(verticies,triangles,par)
-
+    triangles = map(Int32,triangles) - 1
+    
     outmsh_verticies = zeros(Float64,NSIZE)
     outmsh_triangles = zeros(Int32,NSIZE)
     outmsh_Nverticies = Ref{Cint}(0)
@@ -108,6 +111,64 @@ function improvemesh(verticies,triangles,par)
     tout = outmsh_triangles[1:3*outmsh_Ntriangles[]]
     tout = reshape(tout,3,convert(Int,outmsh_Ntriangles[]))
 
-    return pout,tout+1
+    return pout,map(Int,tout)+1
+end
+
+
+function improvemeshcol(verticies,triangles,newverticies,par)
+    triangles = map(Int32,triangles) - 1
+    actual_dt = Ref{Float64}(0)
+    
+    outmsh_verticies = zeros(Float64,NSIZE)
+    outmsh_triangles = zeros(Int32,NSIZE)
+    outmsh_Nverticies = Ref{Cint}(0)
+    outmsh_Ntriangles = Ref{Cint}(0)
+
+    # @show ccall((:improvemesh, "/home/janiserdmanis/Documents/eltopo-master-old/mycode/eltopo.so"),Void,
+    #             (Ptr{Cdouble},Cint,Ptr{Cint},Cint,
+    #              Ptr{Cdouble},Ref{Cint},Ptr{Cint},Ref{Cint}),
+    #             inmsh_verticies,length(inmsh_verticies),inmsh_triangles,length(inmsh_triangles),
+    # outmsh_verticies,outmsh_Nverticies,outmsh_triangles,outmsh_Ntriangles)
+
+    
+    ccall((:improvecol, libpath),Void,
+                (Ptr{Cdouble},Cint,Ptr{Cint},Cint,
+                 Ptr{Cdouble},Ref{Cint},Ptr{Cint},Ref{Cint},
+                 Cdouble, Ptr{Cdouble}, Ref{Cdouble},
+                 Cdouble,Cdouble,Cdouble,Cdouble,Cint,Cdouble,Cdouble,Cdouble,Cdouble,Cdouble,Cint,Cint,Cdouble,Cdouble,Cint,Cdouble,Cdouble,Cint,Cint,Cint,Cint,Cint
+                 ),
+                verticies,size(verticies,2),triangles,size(triangles,2),
+    outmsh_verticies,outmsh_Nverticies,outmsh_triangles,outmsh_Ntriangles,
+    par.m_dt, newverticies, actual_dt,
+    par.m_proximity_epsilon,
+    par.m_friction_coefficient,
+    par.m_min_triangle_area,
+    par.m_improve_collision_epsilon,
+    par.m_use_fraction,
+    par.m_min_edge_length,
+    par.m_max_edge_length,
+    par.m_max_volume_change,
+    par.m_min_triangle_angle,
+    par.m_max_triangle_angle,
+    par.m_use_curvature_when_splitting,
+    par.m_use_curvature_when_collapsing,
+    par.m_min_curvature_multiplier,
+    par.m_max_curvature_multiplier,
+    par.m_allow_vertex_movement,
+    par.m_edge_flip_min_length_change,
+    par.m_merge_proximity_epsilon,
+    par.m_collision_safety,
+    par.m_allow_topology_changes,
+    par.m_allow_non_manifold,
+    par.m_perform_improvement,
+    par.m_verbose
+    )
+    
+    pout = outmsh_verticies[1:3*outmsh_Nverticies[]]
+    pout = reshape(pout,3,convert(Int,outmsh_Nverticies[]))
+    tout = outmsh_triangles[1:3*outmsh_Ntriangles[]]
+    tout = reshape(tout,3,convert(Int,outmsh_Ntriangles[]))
+
+    return actual_dt[],pout,map(Int,tout)+1
 end
 
