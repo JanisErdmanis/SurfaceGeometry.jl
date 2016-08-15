@@ -105,7 +105,7 @@ function stabiliseV3Optim!(points,faces,n,v,zc::Erdmanis2016)
         end
     end
 
-    res = optimize(f,g!,v[:],method=:cg,ftol=zc.ftol)
+    res = optimize(f,g!,v[:],method=Optim.ConjugateGradient(),ftol=zc.ftol)
     v[:,:] = reshape(res.minimum, size(v)...)[:,:]
 end
 

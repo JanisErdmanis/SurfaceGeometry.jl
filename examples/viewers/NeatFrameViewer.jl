@@ -60,9 +60,15 @@ function main(window)
            initscene() <<
            [
          ### Pozikridis veids ka attlot meshu
-            ThreeJS.mesh(0.0, 0.0, 0.0) << [ geom(ff), material(Dict(:color=>"white", :kind=>"basic")) ], 
-            ThreeJS.mesh(0.0, 0.0, 0.0) << [ geom(ff), material(Dict(:kind=>"basic",:color=>"black",:wireframe=>true,:wireframeLinewidth=>2)) ], # :wireframe=>true ],
-            camera(10.0, 0., 0.,far=1.,fov=10.),
+            #ThreeJS.mesh(0.0, 0.0, 0.0) << [ geom(ff), material(Dict(:color=>"red",:kind=>"phong")) ], 
+            ThreeJS.mesh(0.0, 0.0, 0.0) << [ geom(ff), material(Dict(:color=>"red",:kind=>"lambert")) ], 
+            #ThreeJS.mesh(0.0, 0.0, 0.0) << [ geom(ff), material(Dict(:kind=>"basic",:color=>"black",:wireframe=>true,:wireframeLinewidth=>2)) ], # :wireframe=>true ],
+            pointlight(0.,10.,10.),
+             #ambientlight(0x404040),
+#            pointlight(0.,-10.,0.),
+ #           pointlight(0.,0.,10.),
+#             pointlight(0.,0.,-10.),
+            camera(10.0, 0., 0.),
            ]
           )
           )
