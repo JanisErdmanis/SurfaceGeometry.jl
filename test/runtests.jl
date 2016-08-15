@@ -173,12 +173,12 @@ end
 
 ### And now integrators
 
-println("With Eigene test checking surface integrators")
+# println("With Eigene test checking surface integrators")
 
-N = 100
-PasiveStabilisation = false
-include("integrator.jl")
-@test SphereError(p2) < 0.0008
+# N = 5
+# PasiveStabilisation = false
+# include("integrator.jl")
+# @test SphereError(p2) < 0.0008
 
 ### ElTopo mesh stabilisation
 
