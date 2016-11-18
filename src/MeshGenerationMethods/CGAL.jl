@@ -16,8 +16,12 @@ function EllipsoidMesh(a,b,c,cg::CGALSurfaceMesher)
 
     fdis(x,y,z) = x^2/a^2 + y^2/b^2 + z^2/c^2 - 1
     SurfaceMesh(fdis,cg)
+
 end
 
+
+const cgallib = joinpath(dirname(dirname(@__FILE__)),"libraries","cgal","libcgalmesh.so")
+                         
 function SurfaceMesh(fdis::Function,ds::CGALSurfaceMesher)
     
     const sdf_c = cfunction(fdis, Cfloat, (Cfloat,Cfloat,Cfloat))
@@ -28,12 +32,13 @@ function SurfaceMesh(fdis::Function,ds::CGALSurfaceMesher)
     Nverticies = Ref{Cint}(0)
     Nfaces = Ref{Cint}(0)
 
-    cgallib = Pkg.dir("SurfaceGeometry","src","libraries","cgal","libcgalmesh.so")
+    #const cgallib = Pkg.dir("SurfaceGeometry","src","libraries","cgal","libcgalmesh.so")
+
 
     ### This part is really ugly
-    eval(:(ccall((:genmesh, $cgallib),Void,(Ptr{Void},Cfloat,Cfloat,Cfloat,Cfloat,Ptr{Cfloat},Ptr{Cint},Ref{Cint},Ref{Cint}),$sdf_c,$(ds.AngularBound),$(ds.RadiusBound),$(ds.DistanceBound),$(ds.BoundingRadius),$verticies,$faces,$Nverticies,$Nfaces)))
+    #eval(:(ccall((:genmesh, $cgallib),Void,(Ptr{Void},Cfloat,Cfloat,Cfloat,Cfloat,Ptr{Cfloat},Ptr{Cint},Ref{Cint},Ref{Cint}),$sdf_c,$(ds.AngularBound),$(ds.RadiusBound),$(ds.DistanceBound),$(ds.BoundingRadius),$verticies,$faces,$Nverticies,$Nfaces)))
     
-    #ccall((:genmesh, "/home/janiserdmanis/Documents/cgal/libelipsoid.so"),Void,(Ptr{Void},Cfloat,Cfloat,Cfloat,Cfloat,Ptr{Cfloat},Ptr{Cint},Ref{Cint},Ref{Cint}),sdf_c,ds.AngularBound,ds.RadiusBound,ds.DistanceBound,ds.BoundingRadius,verticies,faces,Nverticies,Nfaces)
+    ccall((:genmesh, cgallib),Void,(Ptr{Void},Cfloat,Cfloat,Cfloat,Cfloat,Ptr{Cfloat},Ptr{Cint},Ref{Cint},Ref{Cint}),sdf_c,ds.AngularBound,ds.RadiusBound,ds.DistanceBound,ds.BoundingRadius,verticies,faces,Nverticies,Nfaces)
 
     verticies = reshape(verticies[1:(3*Nverticies[])],3,Int(Nverticies[]))
     faces = reshape(faces[1:(3*Nfaces[])],3,Int(Nfaces[])) + 1

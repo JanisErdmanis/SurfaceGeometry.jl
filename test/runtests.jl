@@ -21,15 +21,15 @@ function SphereError(points)
 end
 
 ### Loading of mesh for other tests
-println("Mesh loading test")
+info("Mesh loading test")
 using JLD
-data = load("sphere.jld")
+data = load(joinpath(dirname(@__FILE__),"sphere.jld"))
 points = data["points"]
 faces = data["faces"]
 
 @test SphereError(points) < 0.01
 
-println("Mesh generation with CGAL")
+info("Mesh generation with CGAL")
 
 ### Interface will change to pass signed distance function
 ### CGAL mesh generator
@@ -40,13 +40,23 @@ points, faces = SurfaceMesh(fdis,mesher)
 @test SphereError(points) < 0.01
 
 ### Matlab mesh generator
-println("Mesh generation with distmesh")
+info("Mesh generation with distmesh")
 try
-    mesher = DistmeshSurfaceMesher(0.35)
-    points, faces = EllipsoidMesh(1,1,1,mesher)
+    step,boxsize = 0.2,[-1.1 -1.1 -1.1; 1.1 1.1 1.1]
+    mesher = DistmeshSurfaceMesher(step,boxsize)
+
+    a,b,c = 1,1,1
+    signedf = """
+    function f = fd(p)
+        f = p(:,1).^2/$(a^2)+p(:,2).^2/$(b^2)+p(:,3).^2/$(c^2)-1;
+    end
+    
+    """
+    
+    points, faces = SurfaceMesh(signedf,mesher)
     @test SphereError(points) < 0.01
 catch
-    warn("does not work")
+     warn("does not work")
 end
 
 ### Testing a pushback
@@ -55,7 +65,7 @@ end
 
 ### Testing topology
 
-println("Topology function tests")
+info("Topology function tests")
 
 t = [5,7,10,7,5,6,4,0,3,0,4,6,4,7,6,4,9,10,7,4,10,0,2,1,2,0,6,2,5,1,5,2,6,8,4,3,4,11,9,8,11,4,9,11,3,11,8,3]
 faces = reshape(t,(3,div(length(t),3))) + 1 
@@ -83,7 +93,7 @@ end
 
 @test sort(verticies)==[1,4,7,8,9,10,11,12] #[1,2,6,7]
 
-println("Testing Complex DS")
+info("Testing Complex DS")
 
 points = zeros(size(faces)...)
 fb = FaceBasedDS(faces)
@@ -108,10 +118,11 @@ end
 
 @test sort(verticies)==[1,4,7,8,9,10,11,12]
 
-println("Topology tests for Connectivity table")
+info("Topology tests for Connectivity table")
 
 using JLD
-data = load("sphere.jld")
+data = load(joinpath(dirname(@__FILE__),"sphere.jld"))
+#data = load("sphere.jld")
 faces = data["faces"]
 
 con = ConnectivityDS(faces,10)
@@ -134,10 +145,11 @@ end
 
 ##### Surface Properties ######
 
-println("Tests for surface properties")
+info("Tests for surface properties")
 
 using JLD
-data = load("sphere.jld")
+data = load(joinpath(dirname(@__FILE__),"sphere.jld"))
+#data = load("sphere.jld")
 points = data["points"]
 faces = data["faces"]
 
@@ -173,22 +185,37 @@ end
 
 ### And now integrators
 
-# println("With Eigene test checking surface integrators")
-
-# N = 5
-# PasiveStabilisation = false
-# include("integrator.jl")
-# @test SphereError(p2) < 0.0008
-
-### ElTopo mesh stabilisation
+# Calculating velocities
 
 mesher = CGALSurfaceMesher()
 fdis(x,y,z) = x^2 + y^2 + z^2 - 1
-p,t = SurfaceMesh(fdis,mesher)
+points,faces = SurfaceMesh(fdis,mesher)
 
+function velocity(t,pos)
+    x,y,z = pos
+    
+    x = x*0.15 + 0.35
+    y = y*0.15 + 0.35
+    z = z*0.15 + 0.35
+
+    u = 2*sin(pi*x)^2 * sin(2*pi*y) * sin(2*pi*z) * sin(2/3*pi*t)
+    v = - sin(2*pi*x) * sin(pi*y)^2 * sin(2*pi*z) * sin(2/3*pi*t)
+    w = - sin(2*pi*x) * sin(2*pi*y) * sin(pi*z)^2 * sin(2/3*pi*t)
+
+    [u,v,w] /0.15
+end
+
+v = zeros(points)
+t = 1
+for i in 1:size(points,2)
+    v[:,i] = velocity(t,points[:,i])
+end
+
+info("Testing pasive mesh stabilisation")
+res =  stabilise(points,faces,v)
+println("Energy before minimization Finit=$(res.Finit) after Fres=$(res.Fres)")
+
+info("Testing ElTopo stabilisation")
 par = Elparameters()
-inmsh_verticies = 0.15*p .+ [0.35,0.35,0.35]
-inmsh_triangles = map(Int32,t) - 1
-
-points, faces = improvemesh(inmsh_verticies,inmsh_triangles,par)
+points, faces = improvemeshcol(points,faces,points + 0.1*v,par)
 

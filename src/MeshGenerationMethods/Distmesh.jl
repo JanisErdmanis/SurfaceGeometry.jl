@@ -22,10 +22,10 @@ function SurfaceMesh(fdis::AbstractString,ds::DistmeshSurfaceMesher)
 
     tmpdir = mktempdir()
 
-
-
-    eval_string("""addpath('$(Pkg.dir("SurfaceGeometry","src","libraries","distmesh"))')""")
-    eval_string("""addpath('$tmpdir')""")
+    #distmeshdir = Pkg.dir("SurfaceGeometry","src","libraries","distmesh")
+    distmeshdir = ascii(joinpath(dirname(dirname(@__FILE__)),"libraries","distmesh"))
+    eval_string("addpath('$distmeshdir')")
+    eval_string("addpath('$tmpdir')")
 
     file = open("meshgen.m","w")
     

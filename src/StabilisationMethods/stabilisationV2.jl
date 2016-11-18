@@ -173,7 +173,7 @@ function stabiliseV2Optim!(points,faces,n,v,zc::Zinchenko2013)
         end
     end
 
-    res = optimize(f,g!,v[:],method=:cg,ftol=zc.ftol)
+    res = optimize(f,g!,v[:],BFGS())
     v[:,:] = reshape(res.minimum, size(v)...)[:,:]
 end
 
