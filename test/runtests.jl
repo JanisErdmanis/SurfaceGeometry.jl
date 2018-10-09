@@ -1,11 +1,13 @@
-using SurfaceGeometry
-using Base.Test
+#using SurfaceGeometry
+using Main.SurfaceGeometry
+using LinearAlgebra
+using Test
 
 # Pkg.test("SurfaceGeometry")
 # write your own tests here
-#@test 1 == 2
+# @test 1 == 2
 
-### Loading of spherical mesh
+# Loading of spherical mesh
 
 function SphereError(points)
     error = 0
@@ -21,7 +23,7 @@ function SphereError(points)
 end
 
 ### Loading of mesh for other tests
-info("Mesh loading test")
+@info "Mesh loading test"
 using JLD
 data = load(joinpath(dirname(@__FILE__),"sphere.jld"))
 points = data["points"]
@@ -29,7 +31,7 @@ faces = data["faces"]
 
 @test SphereError(points) < 0.01
 
-info("Mesh generation with CGAL")
+@info "Mesh generation with CGAL"
 
 ### Interface will change to pass signed distance function
 ### CGAL mesh generator
@@ -40,10 +42,10 @@ points, faces = SurfaceMesh(fdis,mesher)
 @test SphereError(points) < 0.01
 
 ### Matlab mesh generator
-info("Mesh generation with distmesh")
+@info "Mesh generation with distmesh"
 try
     step,boxsize = 0.2,[-1.1 -1.1 -1.1; 1.1 1.1 1.1]
-    mesher = DistmeshSurfaceMesher(step,boxsize)
+    global mesher = DistmeshSurfaceMesher(step,boxsize)
 
     a,b,c = 1,1,1
     signedf = """
@@ -53,10 +55,10 @@ try
     
     """
     
-    points, faces = SurfaceMesh(signedf,mesher)
+    global points, faces = SurfaceMesh(signedf,mesher)
     @test SphereError(points) < 0.01
 catch
-     warn("does not work")
+    @warn "does not work"
 end
 
 ### Testing a pushback
@@ -65,10 +67,10 @@ end
 
 ### Testing topology
 
-info("Topology function tests")
+@info "Topology function tests"
 
 t = [5,7,10,7,5,6,4,0,3,0,4,6,4,7,6,4,9,10,7,4,10,0,2,1,2,0,6,2,5,1,5,2,6,8,4,3,4,11,9,8,11,4,9,11,3,11,8,3]
-faces = reshape(t,(3,div(length(t),3))) + 1 
+faces = reshape(t,(3,div(length(t),3))) .+ 1 
 
 triangles = []
 for i in FaceVRing(5,faces)
@@ -93,7 +95,7 @@ end
 
 @test sort(verticies)==[1,4,7,8,9,10,11,12] #[1,2,6,7]
 
-info("Testing Complex DS")
+@info "Testing Complex DS"
 
 points = zeros(size(faces)...)
 fb = FaceBasedDS(faces)
@@ -118,7 +120,7 @@ end
 
 @test sort(verticies)==[1,4,7,8,9,10,11,12]
 
-info("Topology tests for Connectivity table")
+@info "Topology tests for Connectivity table"
 
 using JLD
 data = load(joinpath(dirname(@__FILE__),"sphere.jld"))
@@ -145,7 +147,7 @@ end
 
 ##### Surface Properties ######
 
-info("Tests for surface properties")
+@info "Tests for surface properties"
 
 using JLD
 data = load(joinpath(dirname(@__FILE__),"sphere.jld"))
@@ -153,12 +155,12 @@ data = load(joinpath(dirname(@__FILE__),"sphere.jld"))
 points = data["points"]
 faces = data["faces"]
 
-n = Array(Float64,size(points)...)
+n = Array{Float64}(undef,size(points)...)
 NormalVectors!(n,points,faces,i->FaceVRing(i,faces))
-curvatures = Array(Float64,size(points,2))
+curvatures = Array{Float64}(undef,size(points,2))
 MeanCurvatures!(curvatures,points,faces,n,i->FaceVRing(i,faces))
 
-angle = 0
+angle_ = 0
 curvaturer = 0
 
 for xkey in 1:size(points,2)
@@ -168,8 +170,8 @@ for xkey in 1:size(points,2)
 
     nT = points[:,xkey]/norm(points[:,xkey])
     angl = acos(dot(ncalc,nT))
-    if angl>angle
-        angle = angl
+    if angl>angle_
+        angle_ = angl
     end
 
     cT = 1.
@@ -177,7 +179,7 @@ for xkey in 1:size(points,2)
     curvaturer += abs((ccalc - cT)/cT)/N
 end
 
-@test angle*180/pi < 1.3
+@test angle_*180/pi < 1.3
 @test curvaturer < 0.01
 
 @test isapprox(volume(points,faces),4/3*pi,atol=0.05)
@@ -211,11 +213,11 @@ for i in 1:size(points,2)
     v[:,i] = velocity(t,points[:,i])
 end
 
-info("Testing pasive mesh stabilisation")
+@info "Testing pasive mesh stabilisation"
 res =  stabilise(points,faces,v)
 println("Energy before minimization Finit=$(res.Finit) after Fres=$(res.Fres)")
 
-info("Testing ElTopo stabilisation")
-par = Elparameters()
-points, faces = improvemeshcol(points,faces,points + 0.1*v,par)
+# @info "Testing ElTopo stabilisation"
+# par = Elparameters()
+# points, faces = improvemeshcol(points,faces,points + 0.1*v,par)
 

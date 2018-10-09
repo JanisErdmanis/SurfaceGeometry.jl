@@ -1,6 +1,6 @@
 # include("Utils.jl")
 
-immutable DistmeshSurfaceMesher
+struct DistmeshSurfaceMesher
     step::Float64
     boxsize::Array{Float64,2}
 end

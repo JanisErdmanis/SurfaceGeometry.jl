@@ -1,9 +1,9 @@
-using SurfaceGeometry
+#using SurfaceGeometry
 using Optim
 
 using Parameters
 
-@with_kw immutable Erdmanis2016
+@with_kw struct Erdmanis2016
     C::AbstractFloat = 0.4
     ftol::AbstractFloat = 1e-6
 end
@@ -92,7 +92,7 @@ function stabiliseV3Optim!(points,faces,n,v,zc::Erdmanis2016)
     end
 
 
-    function g!(x::Vector, storage::Vector)
+    function g!(storage::Vector,x::Vector)
 
         vv = reshape(x,size(points)...)
         gradf = reshape(storage,size(points)...)
@@ -112,10 +112,10 @@ end
 
 function stabiliseV3!(points,faces,n,v,zc::Erdmanis2016)
 
-    gradF_v = Array(Float64,size(points)...)
+    gradF_v = Array{Float64}(undef,size(points)...)
     gradF!(points,faces,v,gradF_v,zc)
     
-    f = Array(Float64,size(points)...)
+    f = Array{Float64}(undef,size(points)...)
     for i in 1:size(points,2)
         f[:,i] = - (eye(3) - n[:,i]*n[:,i]') * gradF_v[:,i] 
     end
@@ -123,18 +123,18 @@ function stabiliseV3!(points,faces,n,v,zc::Erdmanis2016)
     Fs = Inf
     eps = 1e-4
 
-    gradF_f = Array(Float64,size(points)...)
+    gradF_f = Array{Float64}(undef,size(points)...)
     gradF!(points,faces,f,gradF_f,zc)
 
     q = 2*dot(gradF_f[:],f[:])
     s = dot(gradF_v[:],f[:]) + dot(gradF_f[:],v[:])
     ksi = - s/q
 
-    gradF_dv = Array(Float64,size(points)...)
+    gradF_dv = Array{Float64}(undef,size(points)...)
     vp = copy(v)
     v[:,:] = v[:,:] + ksi*f[:,:]
 
-    step = 1
+    # step = 1
     for step in 1:150
 
         gradF!(points,faces,v,gradF_v,zc)
@@ -159,8 +159,8 @@ function stabiliseV3!(points,faces,n,v,zc::Erdmanis2016)
         end
     end
 
-    if step>100
-        warn("stabilistation used $step steps")
-    end
+    # if step>100
+    #     warn("stabilistation used $step steps")
+    # end
 end
 

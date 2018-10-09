@@ -1,6 +1,6 @@
-using SurfaceGeometry
+#using SurfaceGeometry
 
-immutable Zinchenko1997
+struct Zinchenko1997
     VertexRing
 end
 
@@ -162,17 +162,17 @@ function stabilise!(points,faces,n,va,mc::Zinchenko1997)
 
     VertexRing = mc.VertexRing
     
-    ff = Array(Float64,size(points)...)
+    ff = Array{Float64}(undef,size(points)...)
     for j in 1:size(points,2)
         ring = VertexRing(j)
         ff[:,j] = f(j,n[:,j],points,va,ring)
     end
     ksi0 = conjugrad0(points,faces,va,ff)
     vb = va + ksi0*ff
-    vtemp = Array(Float64,size(va)...)
+    vtemp = Array{Float64}(undef,size(va)...)
 
     Fitemp = Inf
-    i = 1
+    
     for i in 1:200
         
         for j in 1:size(points,2)
@@ -193,11 +193,11 @@ function stabilise!(points,faces,n,va,mc::Zinchenko1997)
 
         if abs(Fitemp-Fi)<eps*Fi
             break
+
+            if i>100
+                warn("Stabilisation had $i iterations")
+            end
         end
         Fitemp = Fi
-    end
-
-    if i>100
-        warn("Stabilisation had $i iterations")
     end
 end

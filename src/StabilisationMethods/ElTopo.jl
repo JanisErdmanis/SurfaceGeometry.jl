@@ -1,7 +1,7 @@
 NSIZE = 100000
 
 using Parameters
-@with_kw type Elparameters
+@with_kw struct Elparameters
     #/// Elements closer than this are considered "near" (or proximate)
     m_proximity_epsilon::Float64 = 1e-4
     m_friction_coefficient::Float64 = 0.0
@@ -62,7 +62,7 @@ end
 const libpath = joinpath(dirname(dirname(@__FILE__)),"libraries","eltopo-wrapper", "eltopo.so")
 
 function improvemesh(verticies,triangles,par)
-    triangles = map(Int32,triangles) - 1
+    triangles = map(Int32,triangles) .- 1
     
     outmsh_verticies = zeros(Float64,NSIZE)
     outmsh_triangles = zeros(Int32,NSIZE)
@@ -76,7 +76,7 @@ function improvemesh(verticies,triangles,par)
     # outmsh_verticies,outmsh_Nverticies,outmsh_triangles,outmsh_Ntriangles)
 
     
-    ccall((:improvemesh, libpath),Void,
+    ccall((:improvemesh, libpath),Nothing,
                 (Ptr{Cdouble},Cint,Ptr{Cint},Cint,
                  Ptr{Cdouble},Ref{Cint},Ptr{Cint},Ref{Cint},
                  Cdouble,Cdouble,Cdouble,Cdouble,Cint,Cdouble,Cdouble,Cdouble,Cdouble,Cdouble,Cint,Cint,Cdouble,Cdouble,Cint,Cdouble,Cdouble,Cint,Cint,Cint,Cint,Cint
@@ -117,7 +117,7 @@ end
 
 
 function improvemeshcol(verticies,triangles,newverticies,par)
-    triangles = map(Int32,triangles) - 1
+    triangles = map(Int32,triangles) .- 1
     actual_dt = Ref{Float64}(0)
     
     outmsh_verticies = zeros(Float64,NSIZE)
@@ -132,7 +132,7 @@ function improvemeshcol(verticies,triangles,newverticies,par)
     # outmsh_verticies,outmsh_Nverticies,outmsh_triangles,outmsh_Ntriangles)
 
     
-    ccall((:improvecol, libpath),Void,
+    ccall((:improvecol, libpath),Nothing,
                 (Ptr{Cdouble},Cint,Ptr{Cint},Cint,
                  Ptr{Cdouble},Ref{Cint},Ptr{Cint},Ref{Cint},
                  Cdouble, Ptr{Cdouble}, Ref{Cdouble},

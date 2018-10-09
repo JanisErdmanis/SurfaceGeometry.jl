@@ -57,7 +57,7 @@ end
 ### Creation routines
 
 
-function isoriented{T <: AbstractFloat, S <: Integer}(points::Array{T,2},triangles::Array{S,2})
+function isoriented(points::Array{T,2},triangles::Array{S,2}) where {T <: AbstractFloat, S <: Integer}
 
     tri = triangles[:,1]
     p1 = points[:,tri[1]]

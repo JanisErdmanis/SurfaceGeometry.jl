@@ -1,0 +1,6 @@
+authors = ["Janis Erdmanis <akels14@gmail.com>"]
+name = "SurfaceGeometry"
+uuid = "b2279eaa-c280-11e8-22b1-f9d34a2a1fce"
+version = "0.1.0"
+
+[deps]

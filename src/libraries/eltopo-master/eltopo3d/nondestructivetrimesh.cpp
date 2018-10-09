@@ -357,19 +357,20 @@ size_t NonDestructiveTriMesh::get_edge_index(size_t vtx0, size_t vtx1) const
     assert( vtx0 < m_vertex_to_edge_map.size() );
     assert( vtx1 < m_vertex_to_edge_map.size() );
     
-    const std::vector<size_t>& edges0 = m_vertex_to_edge_map[vtx0];
-    const std::vector<size_t>& edges1 = m_vertex_to_edge_map[vtx1];
+    const std::vector<size_t>& edges0 = m_vertex_to_edge_map[vtx0]; // edges connected to vtx0
+    const std::vector<size_t>& edges1 = m_vertex_to_edge_map[vtx1]; // edges connected to vtx1
     
     for(size_t e0 = 0; e0 < edges0.size(); e0++)
     {
-        size_t edge0 = edges0[e0];
+        size_t edge0 = edges0[e0]; // One of the mesh edges
         
-        for(size_t e1 = 0; e1 < edges1.size(); e1++)
+        for(size_t e1 = 0; e1 < edges1.size(); e1++) // The other mesh edge edges1[e1]
         {
-            if( edge0 == edges1[e1] && m_edges[edge0][0] != m_edges[edge0][1] )
+            if( edge0 == edges1[e1] && m_edges[edge0][0] != m_edges[edge0][1] ) // if we have the same edge edges0[e1]=edges1[2]
             {
-                assert( ( m_edges[edge0][0] == vtx0 && m_edges[edge0][1] == vtx1 ) ||
-                       ( m_edges[edge0][1] == vtx0 && m_edges[edge0][0] == vtx1 ) );
+              // This is where we have a problem
+              assert( ( m_edges[edge0][0] == vtx0 && m_edges[edge0][1] == vtx1 ) ||
+              ( m_edges[edge0][1] == vtx0 && m_edges[edge0][0] == vtx1 ) );
                 
                 return edge0;
             }

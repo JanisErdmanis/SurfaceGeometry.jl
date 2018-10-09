@@ -1,4 +1,4 @@
-function find_other_triangle_edge{T<:Integer}(v1::Integer,v2::Integer,skip::Integer,t::AbstractArray{T,2})
+function find_other_triangle_edge(v1::Integer,v2::Integer,skip::Integer,t::AbstractArray{T,2}) where {T<:Integer}
     for i in 1:size(t)[end]
         if in(v1,t[:,i]) & in(v2,t[:,i]) & !(i==skip)
             return i
@@ -7,7 +7,7 @@ function find_other_triangle_edge{T<:Integer}(v1::Integer,v2::Integer,skip::Inte
     return -1
 end
 
-function find_triangle_vertex{T<:Integer}(v::Integer,t::AbstractArray{T,2})
+function find_triangle_vertex(v::Integer,t::AbstractArray{T,2}) where {T<:Integer}
 
     for i in 1:size(t,2)
         if in(v,t[:,i])
@@ -22,7 +22,7 @@ FaceRing(v,faces) = error("Deprecated: use FaceVRing")
 FaceRingS(v,faces) = error("Deprecated: use DoubleVertexVRing")
 VeretexRing(v,faces) = error("Deprecated: use VertexVRing")
 
-immutable FaceVRing
+struct FaceVRing
     v::Int
     faces::Array{Int,2}
 end
@@ -37,7 +37,7 @@ function Base.next(iter::FaceVRing,i::Int)
     return i, nexti
 end
 
-immutable DoubleVertexVRing
+struct DoubleVertexVRing
     v::Int
     faces::Array{Int,2}
 end
@@ -59,7 +59,7 @@ end
 
 ### Unordered Veretex ring
 
-immutable VertexVRing
+struct VertexVRing
     v::Int
     faces::Array{Int,2}
 end

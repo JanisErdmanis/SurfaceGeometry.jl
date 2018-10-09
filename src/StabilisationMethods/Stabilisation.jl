@@ -1,7 +1,7 @@
 ### All possible fields
 ### If it initialisation lacks some fields then it might be resolved with simpler constructors
 ### Similar type could be made for RestructurisationResults
-immutable StabilisationResults
+struct StabilisationResults
     zc
     vinit
     Finit
@@ -20,7 +20,7 @@ end
 # High level interface. If you trust enough ;)
 function stabilise(points,faces,v;method=:Zinchenko2013,vp=zeros(size(points)...))
 
-    n = Array(Float64,size(points)...)
+    n = Array{Float64}(undef,size(points)...)
     NormalVectors!(n,points,faces,i -> FaceVRing(i,faces))
     
     ### Projecting previous velocity

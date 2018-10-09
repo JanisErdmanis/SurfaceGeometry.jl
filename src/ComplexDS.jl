@@ -1,6 +1,6 @@
 ### More advanced data structures
 
-type FaceBasedDS
+struct FaceBasedDS
     faces::AbstractArray{Int,2}
     neighs::AbstractArray{Int,2} ### For now keeping simple
     vfaces::AbstractArray{Int,1}
@@ -9,8 +9,8 @@ end
 
 function FaceBasedDS(faces::Array{Int,2})
 
-    vfaces = Array(Int,maximum(faces))
-    neighs = Array(Int,size(faces)...)
+    vfaces = Array{Int}(undef,maximum(faces))
+    neighs = Array{Int}(undef,size(faces)...)
     
     for vi in 1:maximum(faces)
         vfaces[vi] = find_triangle_vertex(vi,faces)
@@ -30,7 +30,7 @@ end
 """
 Iterator for getting all triangles around vertex
 """
-immutable FaceVRingFB
+struct FaceVRingFB
     v::Int
     faces::Array{Int,2}
     neighs::Array{Int,2} ### For now keeping simple
@@ -77,7 +77,7 @@ end
 
 ###
 
-immutable DoubleVertexVRingFB
+struct DoubleVertexVRingFB
     v::Int
     faces::Array{Int,2}
     neighs::Array{Int,2} ### For now keeping simple
@@ -128,7 +128,7 @@ end
 """
 Now the magic of making VertexIterator
 """
-immutable VertexVRingFB
+struct VertexVRingFB
     v::Int
     faces::Array{Int,2}
     neighs::Array{Int,2} ### For now keeping simple
@@ -183,7 +183,7 @@ end
 
 ### Using conectivity for improving performance
 
-immutable ConnectivityDS
+struct ConnectivityDS
     connectivity
 end
 
@@ -191,8 +191,8 @@ function ConnectivityTable(faces,valence)
     vmax = maximum(faces)
     connectivity = zeros(Int,valence,vmax)
     for i in 1:vmax
-        v1 = Array(Int,0)
-        v2 = Array(Int,0)
+        v1 = Array{Int}(undef,0)
+        v2 = Array{Int}(undef,0)
         for (v1i,v2i) in DoubleVertexVRing(i,faces)
             push!(v1,v1i)
             push!(v2,v2i)
@@ -211,7 +211,7 @@ end
 
 ConnectivityDS(faces,valence) = ConnectivityDS(ConnectivityTable(faces,valence))
 
-immutable VertexVRingCon{T<:Integer}
+struct VertexVRingCon{T<:Integer}
     v::T
     connectivity::Array{T,2}
 end
@@ -222,15 +222,15 @@ function Base.start(iter::VertexVRingCon)
     return 1
 end
 
-function Base.done{T<:Integer}(iter::VertexVRingCon,i::T)
+function Base.done(iter::VertexVRingCon,i::T) where {T<:Integer}
     return (i>size(iter.connectivity,1)) || (iter.connectivity[i,iter.v]==0) ? true : false
 end
 
-function Base.next{T<:Integer}(iter::VertexVRingCon,i::T)
+function Base.next(iter::VertexVRingCon,i::T) where {T<:Integer}
     return iter.connectivity[i,iter.v], i+1
 end
 
-immutable DoubleVertexVRingCon{T<:Integer}
+struct DoubleVertexVRingCon{T<:Integer}
     v::T
     connectivity::Array{T,2}
 end
@@ -241,11 +241,11 @@ function Base.start(iter::DoubleVertexVRingCon)
     return 1
 end
 
-function Base.done{T<:Integer}(iter::DoubleVertexVRingCon,i::T)
+function Base.done(iter::DoubleVertexVRingCon,i::T) where {T<:Integer}
     return (i>size(iter.connectivity,1)) || (iter.connectivity[i,iter.v]==0) ? true : false
 end
 
-function Base.next{T<:Integer}(iter::DoubleVertexVRingCon,i::T)
+function Base.next(iter::DoubleVertexVRingCon,i::T) where {T<:Integer}
     v1 = iter.connectivity[i,iter.v]
     v2 = done(iter,i+1) ? iter.connectivity[1,iter.v] : iter.connectivity[i+1,iter.v] # (i==size(iter.connectivity,1)) || (iter.connectivity[i+1,iter.v]==0)
     return (v1,v2), i+1

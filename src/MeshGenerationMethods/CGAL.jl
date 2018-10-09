@@ -1,6 +1,6 @@
 #include("Utils.jl")
 
-immutable CGALSurfaceMesher
+struct CGALSurfaceMesher
     AngularBound::Float64
     RadiusBound::Float64
     DistanceBound::Float64
@@ -21,10 +21,9 @@ end
 
 
 const cgallib = joinpath(dirname(dirname(@__FILE__)),"libraries","cgal","libcgalmesh.so")
-                         
+
 function SurfaceMesh(fdis::Function,ds::CGALSurfaceMesher)
     
-    const sdf_c = cfunction(fdis, Cfloat, (Cfloat,Cfloat,Cfloat))
 
     verticies = zeros(Float32,10000)
     faces = zeros(Int32,10000)
@@ -34,14 +33,16 @@ function SurfaceMesh(fdis::Function,ds::CGALSurfaceMesher)
 
     #const cgallib = Pkg.dir("SurfaceGeometry","src","libraries","cgal","libcgalmesh.so")
 
-
+    #const sdf_c = cfunction(fdis, Cfloat, (Cfloat,Cfloat,Cfloat))
+    sdf_c = cfunction(fdis, Cfloat, (Cfloat,Cfloat,Cfloat))
+    
     ### This part is really ugly
     #eval(:(ccall((:genmesh, $cgallib),Void,(Ptr{Void},Cfloat,Cfloat,Cfloat,Cfloat,Ptr{Cfloat},Ptr{Cint},Ref{Cint},Ref{Cint}),$sdf_c,$(ds.AngularBound),$(ds.RadiusBound),$(ds.DistanceBound),$(ds.BoundingRadius),$verticies,$faces,$Nverticies,$Nfaces)))
     
-    ccall((:genmesh, cgallib),Void,(Ptr{Void},Cfloat,Cfloat,Cfloat,Cfloat,Ptr{Cfloat},Ptr{Cint},Ref{Cint},Ref{Cint}),sdf_c,ds.AngularBound,ds.RadiusBound,ds.DistanceBound,ds.BoundingRadius,verticies,faces,Nverticies,Nfaces)
+    ccall((:genmesh, cgallib),Nothing,(Ptr{Nothing},Cfloat,Cfloat,Cfloat,Cfloat,Ptr{Cfloat},Ptr{Cint},Ref{Cint},Ref{Cint}),sdf_c,ds.AngularBound,ds.RadiusBound,ds.DistanceBound,ds.BoundingRadius,verticies,faces,Nverticies,Nfaces)
 
     verticies = reshape(verticies[1:(3*Nverticies[])],3,Int(Nverticies[]))
-    faces = reshape(faces[1:(3*Nfaces[])],3,Int(Nfaces[])) + 1
+    faces = reshape(faces[1:(3*Nfaces[])],3,Int(Nfaces[])) .+ 1
 
 
     ### This part generally can be solved with volume integration

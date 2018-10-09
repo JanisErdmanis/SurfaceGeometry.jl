@@ -1,6 +1,7 @@
 function vnormal(v::Int,points::Array{Float64,2},faces::Array{Int,2},Iterator)
 
-    N_MWA = zeros(3)
+    #N_MWA = zeros(3)
+    N_MWA = fill(0,3)
 
     for ti in Iterator
         face = faces[:,ti]
@@ -43,7 +44,8 @@ function ZinchenkoDifertential!(vects,vnormal,R)
     d /= norm(d)
         
     Ln = d[1]*Lx + d[2]*Ly + d[3]*Lz
-    R[:,:] = expm(pi*Ln)
+    #R[:,:] = expm(pi*Ln)
+    R[:,:] = exp(pi*Ln)
 
     # println("Rotation matrix is")
     # dump(R)
@@ -53,27 +55,27 @@ function ZinchenkoDifertential!(vects,vnormal,R)
     end
 
     ### Construction of the system
-    A = Array(Float64,3,3)
-    B = Array(Float64,3)
+    A = Array{Float64}(undef,3,3)
+    B = Array{Float64}(undef,3)
 
-    vects_norm2 = Array(Float64,size(vects)[end])
+    vects_norm2 = Array{Float64}(undef,size(vects)[end])
     for vj in 1:size(vects)[end]
        vects_norm2[vj] = norm(vects[:,vj])^2
     end
 
-    A[1,1] = sum(vects[1,:].^4./vects_norm2)
-    A[1,2] = sum(vects[1,:].^3.*vects[2,:]./vects_norm2)
-    A[1,3] = sum(vects[2,:].^2.*vects[1,:].^2./vects_norm2)
+    A[1,1] = sum(vects[1,:].^4 ./vects_norm2)
+    A[1,2] = sum(vects[1,:].^3 .*vects[2,:]./vects_norm2)
+    A[1,3] = sum(vects[2,:].^2 .*vects[1,:].^2 ./vects_norm2)
     A[2,1] = A[1,2]
     A[2,2] = A[1,3]
-    A[2,3] = sum(vects[2,:].^3.*vects[1,:]./vects_norm2)
+    A[2,3] = sum(vects[2,:].^3 .*vects[1,:]./vects_norm2)
     A[3,1] = A[1,3]
     A[3,2] = A[2,3]
-    A[3,3] = sum(vects[2,:].^4./vects_norm2)
+    A[3,3] = sum(vects[2,:].^4 ./vects_norm2)
 
-    B[1] = sum(vects[3,:].*vects[1,:].^2./vects_norm2)
+    B[1] = sum(vects[3,:].*vects[1,:].^2 ./vects_norm2)
     B[2] = sum(vects[1,:].*vects[2,:].*vects[3,:]./vects_norm2)
-    B[3] = sum(vects[2,:].^2.*vects[3,:]./vects_norm2)
+    B[3] = sum(vects[2,:].^2 .*vects[3,:]./vects_norm2)
 
     C,D,E = A\B
     return C,D,E
@@ -83,7 +85,7 @@ end
 function vcurvature(v::Int,points::Array{Float64,2},faces::Array{Int,2},normal,Iterator)
 
     #points = msh.points
-    vring = Array(Int,0)
+    vring = Array{Int}(undef,0)
     for ti in Iterator #TriRing(v,msh)
         face = faces[:,ti]
         cw = (face.==v)[[3,1,2]]
@@ -92,13 +94,14 @@ function vcurvature(v::Int,points::Array{Float64,2},faces::Array{Int,2},normal,I
     end
 
     p0 = points[:,v]
-    vects = Array(Float64,3,length(vring))
+    vects = Array{Float64}(undef,3,length(vring))
     for (j,vi) in enumerate(vring)
         vects[:,j] = points[:,vi] - p0
     end
 
     #vnormall = vnormal(v,points,faces,Iterator) # If I would like to implement more precise curvature calculation
-    R = eye(3)
+    #R = eye(3)
+    R = Matrix{Float64}(I,3,3)
     C,D,E = ZinchenkoDifertential!(vects,normal,R)
 
     A = [C D/2;D/2 E]
@@ -125,7 +128,7 @@ function FitEllipsoid(points)
     d2 = x .* x + y .* y + z .* z; #% the RHS of the llsq problem (y's)
     u = ( D' * D ) \ ( D' * d2 );  #% solution to the normal equations
 
-    v = Array(Float64,10)
+    v = Array{Float64}(undef,10)
     v[1] = u[1] +     u[2] - 1;
     v[2] = u[1] - 2 * u[2] - 1;
     v[3] = u[2] - 2 * u[1] - 1;

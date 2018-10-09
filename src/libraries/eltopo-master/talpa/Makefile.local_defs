@@ -13,16 +13,16 @@ LINK = g++
 
 # For example, on Linux on a PC this will likely work:
 
-#DEPEND = g++ -D__LITTLE_ENDIAN__ -DUSE_FORTRAN_BLAS -DNO_GUI
-#CC = g++ -Wall -D__LITTLE_ENDIAN__ -DUSE_FORTRAN_BLAS -DNO_GUI -fPIC
-#LINK_LIBS = -lGL -lGLU -lglut -llapack -lblas 
+DEPEND = g++ -D__LITTLE_ENDIAN__ -DUSE_FORTRAN_BLAS -DNO_GUI
+CC = g++ -Wall -D__LITTLE_ENDIAN__ -DUSE_FORTRAN_BLAS -DNO_GUI -fPIC
+LINK_LIBS = -lGL -lGLU -lglut -llapack -lblas 
 
-# On Mac OS X, this probably will work:
+# # On Mac OS X, this probably will work:
 
-LINK_LIBS = -framework OpenGL -framework GLUT -framework vecLib 
+# LINK_LIBS = -framework OpenGL -framework GLUT -framework vecLib 
 
-DEPEND = g++ -DNO_GUI
-CC = g++ -Wall -DNO_GUI -fPIC
+# DEPEND = g++ -DNO_GUI
+# CC = g++ -Wall -DNO_GUI -fPIC
 
 # or, to use LLVM:
 
