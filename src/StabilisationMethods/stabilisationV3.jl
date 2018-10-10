@@ -46,7 +46,7 @@ function gradF!(points,faces,v,storage,zc::Erdmanis2016)
 
     Cp = zc.C
 
-    storage[:,:] = 0
+    storage[:,:] .= 0
     
     for i in 1:size(faces,2)
         v1,v2,v3 = faces[:,i]

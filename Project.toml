@@ -1,6 +1,12 @@
-authors = ["Janis Erdmanis <akels14@gmail.com>"]
 name = "SurfaceGeometry"
 uuid = "b2279eaa-c280-11e8-22b1-f9d34a2a1fce"
+authors = ["Janis Erdmanis <akels14@gmail.com>"]
 version = "0.1.0"
 
 [deps]
+ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+JLD = "4138dd39-2aa7-5051-a626-17a0bb65d9c8"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+MATLAB = "10e44e05-a98a-55b3-a45b-ba969058deb6"
+Optim = "429524aa-4258-5aef-a3af-852621145aeb"
+Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"

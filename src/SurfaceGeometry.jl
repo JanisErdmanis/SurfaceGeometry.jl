@@ -1,9 +1,13 @@
 module SurfaceGeometry
 
+using LinearAlgebra
+eye(n) = Matrix(1.0I, n, n)
+
 include("MeshGenerationMethods/Utils.jl")
-include("MeshGenerationMethods/CGAL.jl")
-include("MeshGenerationMethods/Distmesh.jl")
-export EllipsoidMesh, SurfaceMesh, volume, DistmeshSurfaceMesher, CGALSurfaceMesher, subdivision
+#include("MeshGenerationMethods/CGAL.jl")
+#include("MeshGenerationMethods/Distmesh.jl")
+#export EllipsoidMesh, SurfaceMesh, volume, DistmeshSurfaceMesher, CGALSurfaceMesher, subdivision
+export volume, subdivision
 
 include("Iterators.jl")
 include("ComplexDS.jl")

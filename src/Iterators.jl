@@ -27,14 +27,23 @@ struct FaceVRing
     faces::Array{Int,2}
 end
 
-Base.start(iter::FaceVRing) = find_triangle_vertex(iter.v,iter.faces)
-Base.done(iter::FaceVRing,ti::Int) = ti<=size(iter.faces,2) ? false : true
+start(iter::FaceVRing) = find_triangle_vertex(iter.v,iter.faces)
+done(iter::FaceVRing,ti::Int) = ti<=size(iter.faces,2) ? false : true
 
-function Base.next(iter::FaceVRing,i::Int)
+function next(iter::FaceVRing,i::Int)
 
      v = iter.v
     nexti = find_triangle_vertex(iter.v,iter.faces[:,i+1:end]) + i  # possible botleneck here
     return i, nexti
+end
+
+Base.iterate(iter::FaceVRing) = next(iter,start(iter))
+function Base.iterate(iter::FaceVRing,ti::Int)
+    if done(iter,ti)
+        return nothing
+    else
+        return next(iter,ti)
+    end
 end
 
 struct DoubleVertexVRing
@@ -42,10 +51,10 @@ struct DoubleVertexVRing
     faces::Array{Int,2}
 end
 
-Base.start(iter::DoubleVertexVRing) = find_triangle_vertex(iter.v,iter.faces)
-Base.done(iter::DoubleVertexVRing,ti::Int) = ti<=size(iter.faces,2) ? false : true
+start(iter::DoubleVertexVRing) = find_triangle_vertex(iter.v,iter.faces)
+done(iter::DoubleVertexVRing,ti::Int) = ti<=size(iter.faces,2) ? false : true
 
-function Base.next(iter::DoubleVertexVRing,i::Int)
+function next(iter::DoubleVertexVRing,i::Int)
 
     v = iter.v
     nexti = find_triangle_vertex(iter.v,iter.faces[:,i+1:end]) + i  # possible botleneck here
@@ -57,6 +66,15 @@ function Base.next(iter::DoubleVertexVRing,i::Int)
     return (face[cw]...,face[ccw]...), nexti
 end
 
+Base.iterate(iter::DoubleVertexVRing) = next(iter,start(iter))
+function Base.iterate(iter::DoubleVertexVRing,ti::Int)
+    if done(iter,ti)
+        return nothing
+    else
+        return next(iter,ti)
+    end
+end
+
 ### Unordered Veretex ring
 
 struct VertexVRing
@@ -64,10 +82,10 @@ struct VertexVRing
     faces::Array{Int,2}
 end
 
-Base.start(iter::VertexVRing) = find_triangle_vertex(iter.v,iter.faces)
-Base.done(iter::VertexVRing,ti::Int) = ti<=size(iter.faces,2) ? false : true
+start(iter::VertexVRing) = find_triangle_vertex(iter.v,iter.faces)
+done(iter::VertexVRing,ti::Int) = ti<=size(iter.faces,2) ? false : true
 
-function Base.next(iter::VertexVRing,ti::Int)
+function next(iter::VertexVRing,ti::Int)
 
     v = iter.v
     faces = iter.faces
@@ -79,7 +97,14 @@ function Base.next(iter::VertexVRing,ti::Int)
     return vi, nexti
 end
 
-
+Base.iterate(iter::VertexVRing) = next(iter,start(iter))
+function Base.iterate(iter::VertexVRing,ti::Int)
+    if done(iter,ti)
+        return nothing
+    else
+        return next(iter,ti)
+    end
+end
 
 
 

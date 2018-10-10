@@ -39,13 +39,13 @@ end
 
 FaceVRing(v::Int,ds::FaceBasedDS) = FaceVRingFB(v,ds.faces,ds.neighs,ds.vfaces)
     
-function Base.start(iter::FaceVRingFB)
+function start(iter::FaceVRingFB)
     vface = iter.vfaces[iter.v]
     i0 = 1
     return (i0,vface)
 end
 
-function Base.done(iter::FaceVRingFB,state::Tuple{Int,Int})
+function done(iter::FaceVRingFB,state::Tuple{Int,Int})
     i, face = state
     i0, vface = start(iter)
     if !(i==i0) & (face==vface)
@@ -55,7 +55,7 @@ function Base.done(iter::FaceVRingFB,state::Tuple{Int,Int})
     end    
 end
 
-function Base.next(iter::FaceVRingFB,state::Tuple{Int,Int})
+function next(iter::FaceVRingFB,state::Tuple{Int,Int})
 
     i, tri = state
     v = iter.v
@@ -75,6 +75,17 @@ function Base.next(iter::FaceVRingFB,state::Tuple{Int,Int})
     return tri, (i+1,nexttri)
 end
 
+
+Base.iterate(iter::FaceVRingFB) = next(iter,start(iter))
+function Base.iterate(iter::FaceVRingFB,ti)
+    if done(iter,ti)
+        return nothing
+    else
+        return next(iter,ti)
+    end
+end
+
+
 ###
 
 struct DoubleVertexVRingFB
@@ -86,13 +97,13 @@ end
 
 DoubleVertexVRing(v::Int,ds::FaceBasedDS) = DoubleVertexVRingFB(v,ds.faces,ds.neighs,ds.vfaces)
 
-function Base.start(iter::DoubleVertexVRingFB)
+function start(iter::DoubleVertexVRingFB)
     vface = iter.vfaces[iter.v]
     i0 = 1
     return (i0,vface)
 end
 
-function Base.done(iter::DoubleVertexVRingFB,state::Tuple{Int,Int})
+function done(iter::DoubleVertexVRingFB,state::Tuple{Int,Int})
     i, face = state
     i0, vface = start(iter)
     if !(i==i0) & (face==vface)
@@ -102,7 +113,7 @@ function Base.done(iter::DoubleVertexVRingFB,state::Tuple{Int,Int})
     end    
 end
 
-function Base.next(iter::DoubleVertexVRingFB,state::Tuple{Int,Int})
+function next(iter::DoubleVertexVRingFB,state::Tuple{Int,Int})
 
     i, tri = state
     v = iter.v
@@ -123,6 +134,14 @@ function Base.next(iter::DoubleVertexVRingFB,state::Tuple{Int,Int})
     return (face[cw]...,face[ccw]...), (i+1,nexttri)
 end
 
+Base.iterate(iter::DoubleVertexVRingFB) = next(iter,start(iter))
+function Base.iterate(iter::DoubleVertexVRingFB,ti)
+    if done(iter,ti)
+        return nothing
+    else
+        return next(iter,ti)
+    end
+end
 
 
 """
@@ -140,13 +159,13 @@ end
 
 VertexVRing(v::Int,ds::FaceBasedDS) = VertexVRingFB(v,ds.faces,ds.neighs,ds.vfaces[v])
 
-function Base.start(iter::VertexVRingFB)
+function start(iter::VertexVRingFB)
     vface = iter.vface
     i0 = 1
     return (i0,vface)
 end
 
-function Base.done(iter::VertexVRingFB,state::Tuple{Int,Int})
+function done(iter::VertexVRingFB,state::Tuple{Int,Int})
     i, face = state
     if !(i==1) & (face==iter.vface)
         return true
@@ -155,7 +174,7 @@ function Base.done(iter::VertexVRingFB,state::Tuple{Int,Int})
     end    
 end
 
-function Base.next(iter::VertexVRingFB,state::Tuple{Int,Int})
+function next(iter::VertexVRingFB,state::Tuple{Int,Int})
 
     i, tri = state
     v = iter.v
@@ -179,6 +198,15 @@ function Base.next(iter::VertexVRingFB,state::Tuple{Int,Int})
     vi, = face[cw]
     
     return vi, (i+1,nexttri)
+end
+
+Base.iterate(iter::VertexVRingFB) = next(iter,start(iter))
+function Base.iterate(iter::VertexVRingFB,ti)
+    if done(iter,ti)
+        return nothing
+    else
+        return next(iter,ti)
+    end
 end
 
 ### Using conectivity for improving performance
@@ -218,17 +246,28 @@ end
 
 VertexVRing(v::Int,ds::ConnectivityDS) = VertexVRingCon(v,ds.connectivity)
 
-function Base.start(iter::VertexVRingCon)
+function start(iter::VertexVRingCon)
     return 1
 end
 
-function Base.done(iter::VertexVRingCon,i::T) where {T<:Integer}
+function done(iter::VertexVRingCon,i::T) where {T<:Integer}
     return (i>size(iter.connectivity,1)) || (iter.connectivity[i,iter.v]==0) ? true : false
 end
 
-function Base.next(iter::VertexVRingCon,i::T) where {T<:Integer}
+function next(iter::VertexVRingCon,i::T) where {T<:Integer}
     return iter.connectivity[i,iter.v], i+1
 end
+
+
+Base.iterate(iter::VertexVRingCon) = next(iter,start(iter))
+function Base.iterate(iter::VertexVRingCon,ti)
+    if done(iter,ti)
+        return nothing
+    else
+        return next(iter,ti)
+    end
+end
+
 
 struct DoubleVertexVRingCon{T<:Integer}
     v::T
@@ -237,16 +276,25 @@ end
 
 DoubleVertexVRing(v::Int,ds::ConnectivityDS) = DoubleVertexVRingCon(v,ds.connectivity)
 
-function Base.start(iter::DoubleVertexVRingCon)
+function start(iter::DoubleVertexVRingCon)
     return 1
 end
 
-function Base.done(iter::DoubleVertexVRingCon,i::T) where {T<:Integer}
+function done(iter::DoubleVertexVRingCon,i::T) where {T<:Integer}
     return (i>size(iter.connectivity,1)) || (iter.connectivity[i,iter.v]==0) ? true : false
 end
 
-function Base.next(iter::DoubleVertexVRingCon,i::T) where {T<:Integer}
+function next(iter::DoubleVertexVRingCon,i::T) where {T<:Integer}
     v1 = iter.connectivity[i,iter.v]
     v2 = done(iter,i+1) ? iter.connectivity[1,iter.v] : iter.connectivity[i+1,iter.v] # (i==size(iter.connectivity,1)) || (iter.connectivity[i+1,iter.v]==0)
     return (v1,v2), i+1
+end
+
+Base.iterate(iter::DoubleVertexVRingCon) = next(iter,start(iter))
+function Base.iterate(iter::DoubleVertexVRingCon,ti)
+    if done(iter,ti)
+        return nothing
+    else
+        return next(iter,ti)
+    end
 end

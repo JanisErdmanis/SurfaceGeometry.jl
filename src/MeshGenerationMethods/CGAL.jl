@@ -33,8 +33,8 @@ function SurfaceMesh(fdis::Function,ds::CGALSurfaceMesher)
 
     #const cgallib = Pkg.dir("SurfaceGeometry","src","libraries","cgal","libcgalmesh.so")
 
-    #const sdf_c = cfunction(fdis, Cfloat, (Cfloat,Cfloat,Cfloat))
-    sdf_c = cfunction(fdis, Cfloat, (Cfloat,Cfloat,Cfloat))
+    const sdf_c = cfunction(fdis, Cfloat, (Cfloat,Cfloat,Cfloat))
+    #sdf_c = @cfunction(fdis, Cfloat, (Cfloat,Cfloat,Cfloat))
     
     ### This part is really ugly
     #eval(:(ccall((:genmesh, $cgallib),Void,(Ptr{Void},Cfloat,Cfloat,Cfloat,Cfloat,Ptr{Cfloat},Ptr{Cint},Ref{Cint},Ref{Cint}),$sdf_c,$(ds.AngularBound),$(ds.RadiusBound),$(ds.DistanceBound),$(ds.BoundingRadius),$verticies,$faces,$Nverticies,$Nfaces)))

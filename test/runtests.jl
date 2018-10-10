@@ -1,5 +1,4 @@
-#using SurfaceGeometry
-using Main.SurfaceGeometry
+using SurfaceGeometry
 using LinearAlgebra
 using Test
 
@@ -31,35 +30,35 @@ faces = data["faces"]
 
 @test SphereError(points) < 0.01
 
-@info "Mesh generation with CGAL"
+# @info "Mesh generation with CGAL"
 
-### Interface will change to pass signed distance function
-### CGAL mesh generator
+# ### Interface will change to pass signed distance function
+# ### CGAL mesh generator
 
-mesher = CGALSurfaceMesher()
-fdis(x,y,z) = x^2 + y^2 + z^2 - 1
-points, faces = SurfaceMesh(fdis,mesher)
-@test SphereError(points) < 0.01
+# mesher = CGALSurfaceMesher()
+# fdis(x,y,z) = x^2 + y^2 + z^2 - 1
+# points, faces = SurfaceMesh(fdis,mesher)
+# @test SphereError(points) < 0.01
 
 ### Matlab mesh generator
-@info "Mesh generation with distmesh"
-try
-    step,boxsize = 0.2,[-1.1 -1.1 -1.1; 1.1 1.1 1.1]
-    global mesher = DistmeshSurfaceMesher(step,boxsize)
+# @info "Mesh generation with distmesh"
+# try
+#     step,boxsize = 0.2,[-1.1 -1.1 -1.1; 1.1 1.1 1.1]
+#     global mesher = DistmeshSurfaceMesher(step,boxsize)
 
-    a,b,c = 1,1,1
-    signedf = """
-    function f = fd(p)
-        f = p(:,1).^2/$(a^2)+p(:,2).^2/$(b^2)+p(:,3).^2/$(c^2)-1;
-    end
+#     a,b,c = 1,1,1
+#     signedf = """
+#     function f = fd(p)
+#         f = p(:,1).^2/$(a^2)+p(:,2).^2/$(b^2)+p(:,3).^2/$(c^2)-1;
+#     end
     
-    """
+#     """
     
-    global points, faces = SurfaceMesh(signedf,mesher)
-    @test SphereError(points) < 0.01
-catch
-    @warn "does not work"
-end
+#     global points, faces = SurfaceMesh(signedf,mesher)
+#     @test SphereError(points) < 0.01
+# catch
+#     @warn "does not work"
+# end
 
 ### Testing a pushback
 # sdist(x) = x[1]^2 + x[2]^2 + x[3]^2 - 1
@@ -97,7 +96,7 @@ end
 
 @info "Testing Complex DS"
 
-points = zeros(size(faces)...)
+points = zero(faces)
 fb = FaceBasedDS(faces)
 
 triangles = []
@@ -171,12 +170,12 @@ for xkey in 1:size(points,2)
     nT = points[:,xkey]/norm(points[:,xkey])
     angl = acos(dot(ncalc,nT))
     if angl>angle_
-        angle_ = angl
+        global angle_ = angl
     end
 
     cT = 1.
     N = size(points,2)
-    curvaturer += abs((ccalc - cT)/cT)/N
+    global curvaturer += abs((ccalc - cT)/cT)/N
 end
 
 @test angle_*180/pi < 1.3
@@ -189,9 +188,9 @@ end
 
 # Calculating velocities
 
-mesher = CGALSurfaceMesher()
-fdis(x,y,z) = x^2 + y^2 + z^2 - 1
-points,faces = SurfaceMesh(fdis,mesher)
+# mesher = CGALSurfaceMesher()
+# fdis(x,y,z) = x^2 + y^2 + z^2 - 1
+# points,faces = SurfaceMesh(fdis,mesher)
 
 function velocity(t,pos)
     x,y,z = pos
@@ -207,7 +206,7 @@ function velocity(t,pos)
     [u,v,w] /0.15
 end
 
-v = zeros(points)
+v = zero(points)
 t = 1
 for i in 1:size(points,2)
     v[:,i] = velocity(t,points[:,i])

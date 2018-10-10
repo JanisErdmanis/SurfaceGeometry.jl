@@ -102,7 +102,7 @@ function gradF!(points,faces,v,storage,zc::Zinchenko2013)
     Cp = zc.C
     h2 = zc.h2
 
-    storage[:,:] = 0
+    storage[:,:] .= 0
     
     for i in 1:size(faces,2)
         v1,v2,v3 = faces[:,i]
@@ -174,7 +174,8 @@ function stabiliseV2Optim!(points,faces,n,v,zc::Zinchenko2013)
     end
 
     res = optimize(f,g!,v[:],BFGS())
-    v[:,:] = reshape(res.minimum, size(v)...)[:,:]
+    #v[:,:] = reshape(res.minimum, size(v)...)[:,:]
+    v[:,:] = reshape(Optim.minimizer(res), size(v)...)[:,:]
 end
 
 
