@@ -30,42 +30,6 @@ faces = data["faces"]
 
 @test SphereError(points) < 0.01
 
-# @info "Mesh generation with CGAL"
-
-# ### Interface will change to pass signed distance function
-# ### CGAL mesh generator
-
-# mesher = CGALSurfaceMesher()
-# fdis(x,y,z) = x^2 + y^2 + z^2 - 1
-# points, faces = SurfaceMesh(fdis,mesher)
-# @test SphereError(points) < 0.01
-
-### Matlab mesh generator
-# @info "Mesh generation with distmesh"
-# try
-#     step,boxsize = 0.2,[-1.1 -1.1 -1.1; 1.1 1.1 1.1]
-#     global mesher = DistmeshSurfaceMesher(step,boxsize)
-
-#     a,b,c = 1,1,1
-#     signedf = """
-#     function f = fd(p)
-#         f = p(:,1).^2/$(a^2)+p(:,2).^2/$(b^2)+p(:,3).^2/$(c^2)-1;
-#     end
-    
-#     """
-    
-#     global points, faces = SurfaceMesh(signedf,mesher)
-#     @test SphereError(points) < 0.01
-# catch
-#     @warn "does not work"
-# end
-
-### Testing a pushback
-# sdist(x) = x[1]^2 + x[2]^2 + x[3]^2 - 1
-# @test isapprox(norm(pushback(sdist,[1.,1.,1.])),1)
-
-### Testing topology
-
 @info "Topology function tests"
 
 t = [5,7,10,7,5,6,4,0,3,0,4,6,4,7,6,4,9,10,7,4,10,0,2,1,2,0,6,2,5,1,5,2,6,8,4,3,4,11,9,8,11,4,9,11,3,11,8,3]
@@ -186,12 +150,6 @@ end
 
 ### And now integrators
 
-# Calculating velocities
-
-# mesher = CGALSurfaceMesher()
-# fdis(x,y,z) = x^2 + y^2 + z^2 - 1
-# points,faces = SurfaceMesh(fdis,mesher)
-
 function velocity(t,pos)
     x,y,z = pos
     
@@ -216,7 +174,10 @@ end
 res =  stabilise(points,faces,v)
 println("Energy before minimization Finit=$(res.Finit) after Fres=$(res.Fres)")
 
-# @info "Testing ElTopo stabilisation"
-# par = Elparameters()
-# points, faces = improvemeshcol(points,faces,points + 0.1*v,par)
+@info "Testing ElTopo stabilisation"
+par = Elparameters()
+@info "    Part I"
+improvemesh(points,faces,par)
+#@info "    Part II"
+#improvemeshcol(points,faces,points + 0.1*v,par)
 

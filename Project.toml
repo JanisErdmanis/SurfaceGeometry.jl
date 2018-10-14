@@ -4,6 +4,7 @@ authors = ["Janis Erdmanis <akels14@gmail.com>"]
 version = "0.1.0"
 
 [deps]
+ElTopo = "6379d376-cf42-11e8-13e7-47834244551c"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 JLD = "4138dd39-2aa7-5051-a626-17a0bb65d9c8"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
