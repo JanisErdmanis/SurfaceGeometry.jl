@@ -4,25 +4,12 @@
 
 Library for triangular surface mesh generation, stabilisation and surface parameter estimation. It is intended to be used as surface velocity integrator for boundary element method, so I it also includes vertex normal, curvature calculation and also circulators. 
 
-## Future directions
+# Possible future directions
 
-- [ ] Interfacing remesher from http://www.gris.informatik.tu-darmstadt.de/~sfuhrman/remesher.html which should solve bad initial mesh form CGAL
+- Make a mesher algorithm from Meshing.jl marching cubes and remesh that with ElTopo and minimization of elastic surface energy.
+- Implement iterators and mesh operations with edge based data structure (possibly usefull EvolvingGraphs and LightGraphs).
 
-## Mesh Generation
-
-A surface mesh is generated with CGAL by giving signed distance function for `SurfaceMesher` which is negative in body and positive outside. The interface to generate triangular mesh for sphere so is
-```
-fdis(x,y,z) = x^2 + y^2 + z^2 - 1
-points, faces = SurfaceMesh(fdis,CGALSurfaceMesher())
-```
-CGAL mesher has four parameters - `AngularBound` the minimum allowed angle (Warning: stability for CGAL mesher is being (proven?) observed below 30 degrees), `RadiusBound`, `DistanceBound` measures the distance from faces to the meshed surface, `BoundingRadius` sets the bounds where object is going to be meshed. The interface to set theese parameters is `CGALSurfaceMesher(AngularBound,RadiusBound,DistanceBound,BoundingRadius)` or `CGALSurfaceMesher(;AngularBound=25)`. 
-
-The library interfaces Distmesh to generate ellipsodial mesh. For now it much higher qulity surface meshes, but lacks of stability to converge. `DistmeshSurfaceMesher` has one parameter `step` which charetirizes a typical edge length. A typical example to use it is as follows
-```
-a,b,c = 2,1,1
-mesher = DistmeshSurfaceMesher()
-points, faces = EllipsoidMesh(a,b,c,mesher)
-```
+# Mesh Utils
 
 To obtain finer mesh a `subdivision` method can be used. Positions of the new introduced edge nodes can be calculated either by interpolation which can be pushed to real surface if signed distance function is given as argument. The interface for the function 
 ```
