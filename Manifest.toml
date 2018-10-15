@@ -93,8 +93,8 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[ElTopo]]
 deps = ["BinaryProvider", "Libdl", "Parameters"]
-git-tree-sha1 = "2cbaa4c5cba0c05f033f36af3dba16df1a13af60"
-repo-rev = "master"
+git-tree-sha1 = "1c7e17ff3d86406257702dad37ae78cd7b4c02bd"
+repo-rev = "8369df22904cbcd4c6ba551ced58ae78a29b7a82"
 repo-url = "https://github.com/akels/ElTopo.jl"
 uuid = "6379d376-cf42-11e8-13e7-47834244551c"
 version = "0.1.0"
@@ -189,12 +189,6 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
-
-[[MATLAB]]
-deps = ["Libdl", "SparseArrays", "Test"]
-git-tree-sha1 = "323855e9927706cba0fba649be9ffb44e3874d3c"
-uuid = "10e44e05-a98a-55b3-a45b-ba969058deb6"
-version = "0.7.0"
 
 [[Markdown]]
 deps = ["Base64"]
