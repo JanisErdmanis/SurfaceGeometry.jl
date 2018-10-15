@@ -9,9 +9,9 @@ version = "0.8.10"
 
 [[BinaryProvider]]
 deps = ["Libdl", "Pkg", "SHA", "Test"]
-git-tree-sha1 = "38be61810f280c3c478f5c38aaf387f8f9199275"
+git-tree-sha1 = "9930c1a6cd49d9fcd7218df6be417e6ae4f1468a"
 uuid = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
-version = "0.5.1"
+version = "0.5.2"
 
 [[Blosc]]
 deps = ["BinaryProvider", "CMakeWrapper", "Compat", "Libdl"]
@@ -93,7 +93,7 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[ElTopo]]
 deps = ["BinaryProvider", "Libdl", "Parameters"]
-git-tree-sha1 = "5488dfc60d45a959c63bad8dcd3db1d6e753dac2"
+git-tree-sha1 = "2cbaa4c5cba0c05f033f36af3dba16df1a13af60"
 repo-rev = "master"
 repo-url = "https://github.com/akels/ElTopo.jl"
 uuid = "6379d376-cf42-11e8-13e7-47834244551c"
