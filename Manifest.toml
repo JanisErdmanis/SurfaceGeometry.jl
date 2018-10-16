@@ -91,14 +91,6 @@ version = "0.0.7"
 deps = ["LinearAlgebra", "Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
-[[ElTopo]]
-deps = ["BinaryProvider", "Libdl", "Parameters"]
-git-tree-sha1 = "1c7e17ff3d86406257702dad37ae78cd7b4c02bd"
-repo-rev = "8369df22904cbcd4c6ba551ced58ae78a29b7a82"
-repo-url = "https://github.com/akels/ElTopo.jl"
-uuid = "6379d376-cf42-11e8-13e7-47834244551c"
-version = "0.1.0"
-
 [[FileIO]]
 deps = ["Pkg", "Random", "Test"]
 git-tree-sha1 = "481e4db939f005db39f7296599d0543c0744fe30"

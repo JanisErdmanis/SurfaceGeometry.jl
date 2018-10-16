@@ -106,40 +106,9 @@ end
 ```
 Enright (incompressable velocity field proposed in [Enright]]) test is being used for checking the need for stabilisation:
 
-| ![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/OriginalField.gif) | ![](https://raw.githubusercontent.com/akels/SurfaceGeometry.jl/master/img/NormalField.gif) | ![](https://github.com/akels/SurfaceGeometry.jl/blob/master/img/StabilisedField.gif) |
+| ![](img/OriginalField.gif) | ![](img/NormalField.gif) | ![](img/StabilisedField.gif) |
 |---|---|---|
-| Original velocity field | Normal component of it | Stabilisation of velocity normal component |
-
-## Topology Stabilisation
-
-Passive stabilisation make "badness" of triangles distributed evenly with adjustment of tangential velocity. So when most of triangles are bad mesh surgery must be used to avoid degeneration. Here I have interfaced ElTopo library which can be as follows:
-```
-scale = 0.2
-par = Elparameters(
-                   m_use_fraction = false,
-                   m_min_edge_length = 0.7*scale,
-                   m_max_edge_length = 1.5*scale,
-                   m_max_volume_change = 0.1*scale^3,
-                   m_min_curvature_multiplier = 1.0,
-                   m_max_curvature_multiplier = 1.0,
-                   m_merge_proximity_epsilon = 0.5*scale,
-                   m_proximity_epsilon = 0.00001,
-m_perform_improvement = true, 
-m_collision_safety = false,
-m_min_triangle_angle = 15,
-m_max_triangle_angle = 120,
-m_allow_vertex_movement = true,
-m_use_curvature_when_collapsing = false,
-m_use_curvature_when_splitting = false,
-m_dt = h
-)
-actualdt,p,f = improvemeshcol(p,f,p + h*v2,par) 
-```
-where names of parameters is kept the same as in ElTopo library. Integrating further normal component of Enright velocity field shows that this topology stabilisation complements passive stabilisation.
-
-| ![](https://rawgit.com/akels/SurfaceGeometry.jl/master/img/topologystab.svg) | ![](https://rawgit.com/akels/SurfaceGeometry.jl/master/img/thinfeatures.svg)  |
-|---|---|
-| Evolution of mesh | View which shows that thin features are preserved |
+| Evolution of original velocity field | Evolution if only normal component of the velocity field is kept | Evolution with stabilised velocity |
 
 
 
