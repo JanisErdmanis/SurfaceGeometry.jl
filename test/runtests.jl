@@ -149,6 +149,7 @@ end
 @test isapprox(*(FitEllipsoid(points)...),1)
 
 ### And now integrators
+@info "Testing pasive mesh stabilisation"
 
 function velocity(t,pos)
     x,y,z = pos
@@ -170,16 +171,8 @@ for i in 1:size(points,2)
     v[:,i] = velocity(t,points[:,i])
 end
 
-@info "Testing pasive mesh stabilisation"
 res =  stabilise(points,faces,v)
 println("Energy before minimization Finit=$(res.Finit) after Fres=$(res.Fres)")
-
-@info "Testing ElTopo stabilisation"
-par = Elparameters(m_dt=1.0)
-@info "    Part I"
-improvemesh(points,faces,par)
-@info "    Part II"
-improvemeshcol(points,faces,points + 0.01*v,par)
 
 
 
