@@ -32,7 +32,7 @@ function volume(points,faces)
 
     # Calculate face normal
     # Calculate projected area
-    # Calculate ordinary volume 
+    # Calculate ordinary volume
     # Calculate volume between projected and real area
     # (+) if normal is outwards
 end
@@ -47,7 +47,7 @@ function pushback(sdist::Function,x::Array{Float64,1})
         # I allow the root to be only on gradient
     end
     return x
-end    
+end
 
 
 ### Loading mesh by filename in the /preproc directgory
@@ -83,35 +83,36 @@ function isoriented(points::Array{T,2},triangles::Array{S,2}) where {T <: Abstra
 end
 
 
-function subdivision(faces)
-    edges = []
+function subdivision(faces::AbstractArray{T, 2}) where T <: Integer
+    edges = Tuple{T, T}[]
 
     for ti in 1:size(faces,2)
         v1,v2,v3 = faces[:,ti]
 
-        v2<v1 || push!(edges,(v1,v2))
-        v3<v2 || push!(edges,(v2,v3))
-        v1<v3 || push!(edges,(v3,v1))
+        push!(edges, v2 > v1 ? (v1, v2) : (v2, v1))
+        push!(edges, v3 > v2 ? (v2, v3) : (v3, v2))
+        push!(edges, v1 > v3 ? (v3, v1) : (v1, v3))
     end
+    sort!(edges)
+    unique!(edges)
 
-
-    rfaces = Array(Int,3,size(faces,2)*4)
-    N = maximum(faces)
+    rfaces = Array{T}(undef,3,size(faces,2)*4)
+    N = maximum(faces) # number of vertices
 
     for ti in 1:size(faces,2)
 
         v1,v2,v3 = faces[:,ti]
-        e3 = findfirst(edges,v2>v1 ? (v1,v2) : (v2,v1)) + N 
-        e1 = findfirst(edges,v3>v2 ? (v2,v3) : (v3,v2)) + N 
-        e2 = findfirst(edges,v1>v3 ? (v3,v1) : (v1,v3)) + N 
+        e3 = findfirst(isequal(v2 > v1 ? (v1, v2) : (v2, v1)), edges) + N
+        e1 = findfirst(isequal(v3 > v2 ? (v2, v3) : (v3, v2)), edges) + N
+        e2 = findfirst(isequal(v1 > v3 ? (v3, v1) : (v1, v3)), edges) + N
 
-        rfaces[:,4*ti - 3] = [v1,e3,e2]
-        rfaces[:,4*ti - 2] = [v2,e1,e3]
-        rfaces[:,4*ti - 1] = [v3,e2,e1]
-        rfaces[:,4*ti] = [e1,e2,e3]
+        rfaces[:,4*ti - 3] .= [v1,e3,e2]
+        rfaces[:,4*ti - 2] .= [v2,e1,e3]
+        rfaces[:,4*ti - 1] .= [v3,e2,e1]
+        rfaces[:,4*ti] .= [e1,e2,e3]
     end
 
-    return rfaces    
+    return rfaces
 end
 
 function subdivision(points,faces; n=1,method=:linear)
@@ -127,7 +128,7 @@ end
 function LinearSubdivision(points,faces)
 
     rfaces = subdivision(faces)
-    rpoints = Array(Float64,3,maximum(rfaces))
+    rpoints = Array{Float64}(undef,3,maximum(rfaces))
 
     for ti in 1:size(faces,2)
 
@@ -148,18 +149,18 @@ end
 
 function ParaboloidSubdivision(points,faces)
 
-    normals = Array(Float64,size(points)...)
+    normals = Array{Float64}(undef,size(points)...)
     NormalVectors!(normals,points,faces,i->FaceVRing(i,faces))
-    
+
     rfaces = subdivision(faces)
-    rpoints = Array(Float64,3,maximum(rfaces))
+    rpoints = Array{Float64}(undef,3,maximum(rfaces))
 
     vproperties = []
     for xkey in 1:size(points,2)
 
         x = points[:,xkey]
         nx = normals[:,xkey]
-        
+
         vects = Float64[]
         for i in VertexVRing(xkey,faces)
             vi = points[:,i] - x
@@ -175,7 +176,7 @@ function ParaboloidSubdivision(points,faces)
 
     z(x,y,C,D,E) = C*x^2 + D*x*y + E*y^2
     pushon(x,C,D,E,R) = ((xp,yp,zp) = R*x; inv(R)*[xp,yp,z(xp,yp,C,D,E)])
-    
+
     for ti in 1:size(faces,2)
         v1,v2,v3 = faces[:,ti]
         e1,e2,e3 = rfaces[:,4*ti]
@@ -184,7 +185,7 @@ function ParaboloidSubdivision(points,faces)
         rpoints[:,v2] = points[:,v2]
         rpoints[:,v3] = points[:,v3]
 
-        ### It gets overwritten once        
+        ### It gets overwritten once
         xe1 = (points[:,v2] + points[:,v3])/2
         rpoints[:,e1] = xe1 + (pushon(xe1-points[:,v2],vproperties[v2]...) + pushon(xe1-points[:,v3],vproperties[v3]...))/2
 
